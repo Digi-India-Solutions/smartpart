@@ -1,0 +1,67 @@
+/* carousel.css */
+.carousel-content {
+  position: absolute;
+  left: 30%;
+  right: 30%;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+  max-width: 40%;
+  margin: auto;
+  text-align: center;
+}
+
+.carousel-content .blur-btn {
+  padding: 10px 20px;
+  margin-top: 15px;
+  width: 50%;
+  text-decoration: none;
+  color: white;
+  font-size: 20px;
+  background-color:rgba(0, 0, 0, 0.56); /* dark semi-transparent bg */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px); /* Safari support */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  transition: backdrop-filter 0.3s ease, background-color 0.3s ease;
+}
+
+.carousel-content .blur-btn:hover {
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  background-color: rgba(0, 0, 0, 0.867); /* darker on hover */
+}
+
+.dimmed-image {
+  filter: brightness(0.2);
+  height: 600px;
+  object-fit: cover;
+}
+
+.carousel-content h3 {
+  font-size: 3rem;
+}
+
+.carousel-item img {
+  filter: brightness(0.6);
+  /* 0.6 = 60% brightness (adjust as needed) */
+  transition: filter 0.3s ease;
+  /* Smooth transition */
+}
+
+@media only screen and (max-width:768px) {
+  .dimmed-image {
+    height: 200px;
+    object-fit: fill;
+  }
+
+  /* carousel.css */
+  .carousel-content {
+    display: none;
+  }
+
+  .carousel-content h3 {
+    font-size: 26px;
+  }
+}

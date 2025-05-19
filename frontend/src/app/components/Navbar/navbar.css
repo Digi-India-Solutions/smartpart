@@ -1,0 +1,161 @@
+/* Ensure Navbar Stays Sticky */
+.navbar {
+  position: fixed !important; /* Change to fixed for better stickiness */
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1050; /* Higher z-index to stay on top */
+  /* background-color: rgb(31, 147, 255) !important; */
+  background-color: rgb(2, 88, 169) !important;
+  padding: 8px 10px;
+}
+
+
+/* Navbar Links */
+.navbar-collapse .nav-link {
+  color: white !important;
+  font-size: 18px !important;
+  font-weight: 500 !important;
+  transition: color 0.3s ease-in-out !important;
+  padding: 10px 15px !important;
+}
+
+.navbar .nav-link:hover {
+  color: black !important;
+}
+
+/* Navbar Toggler */
+.navbar-toggler {
+  border: none;
+  background-color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.navbar-toggler:focus {
+  box-shadow: none;
+}
+
+/* Logo */
+.navbar-brand img {
+  height: 70px;
+  width: 100%;
+}
+
+/* Search Bar */
+.search-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-form input {
+  width: 250px;
+  border-radius: 5px;
+  border: 1px solid #ced4da;
+  padding: 8px 12px;
+}
+
+.search-form button {
+  border-radius: 5px;
+  padding: 8px 15px;
+}
+
+.whatsap-fix {
+  position: fixed;
+  bottom: 20px; /* Adjusted for better visibility */
+  left: 20px; 
+  z-index: 999;
+  background-color: green;
+  padding: 15px;
+  color: white;
+  border-radius: 50%;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  animation: bubble 1.5s infinite ease-in-out;
+}
+.wechat {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999;
+  background-color: #00bd0a;
+  padding: 15px;
+  color: white;
+  border-radius: 50%;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  animation: floatAnimation 3s infinite ease-in-out;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.wechat:hover {
+  transform: scale(1.1);
+  box-shadow: 0px 6px 15px rgba(0, 255, 0, 0.5);
+}
+
+@keyframes floatAnimation {
+  0% {
+    transform: translateY(0);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  }
+  50% {
+    transform: translateY(-10px);
+    box-shadow: 0px 6px 15px rgba(0, 255, 0, 0.4);
+  }
+  100% {
+    transform: translateY(0);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  }
+}
+
+@keyframes bubble {
+  0% {
+    transform: scale(1);
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  }
+  50% {
+    transform: scale(1.2);
+    box-shadow: 0px 0px 20px rgba(0, 255, 0, 0.6);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  }
+}
+
+
+
+/* Responsive Design */
+@media (max-width: 991px) {
+  .navbar-collapse {
+    text-align: center;
+  }
+
+  .search-form {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .search-form input {
+    width: 100%;
+  }
+
+  .navbar-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-brand img {
+    height: 50px;
+    width: 100%;
+  }
+  .search-form {
+    display: none !important;
+  }
+}

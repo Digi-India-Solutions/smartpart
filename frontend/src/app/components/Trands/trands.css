@@ -1,0 +1,60 @@
+.TrandSec {
+    padding: 40px 0;
+    background: black;
+}
+
+.TrandSec .container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 0 20px;
+}
+
+.TrandSec .row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+@media (min-width: 768px) {
+    .TrandSec .row {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+}
+
+.TrandSec .image-container {
+    width: 100%;
+    max-width: 500px;
+}
+
+.TrandSec img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.TrandSec .text-container {
+    width: 100%;
+    max-width: 600px;
+    padding-top: 20px;
+    text-align: justify;
+}
+
+.TrandSec h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+@media (min-width: 768px) {
+    .TrandSec h3 {
+        font-size: 2rem;
+        text-align: left;
+    }
+}
+
+.text-warning {
+    color:#1f93ff !important;
+}

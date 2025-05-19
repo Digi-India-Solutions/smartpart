@@ -1,0 +1,75 @@
+/* Global Styling */
+.lubricant-container {
+    padding: 40px 0px;
+    background: black;
+  
+  
+  
+  }
+  
+ 
+  
+  .lubricantimg {
+    background-color: black;
+    width: 80px;
+    height: 80px;
+    padding: 0px;
+    object-fit: contain;
+    /* aspect-ratio: 1; */
+  }
+  
+  .lubricant-item:hover {
+    cursor: pointer;
+    background-color: black;
+    transform: scale(1.1);
+    /* Increases the size by 20% */
+  }
+  
+  .lubricant-item {
+    transition: transform 0.1s ease-in-out;
+    border: 1px solid lightgray;
+    justify-content: center;
+    display: grid;
+    padding: 20px;
+  }
+  
+  .lubricant-item p{
+    font-weight: 600;
+    margin-top: 1rem;
+    text-transform: uppercase;
+    margin-bottom: 0;
+    font-size: 20px;
+  
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .lubricant-item p{
+      font-size: 12px;
+    }
+    
+    .brandbox {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  
+    .lubricantimg {
+      width: 80px;
+      height: 50px;
+    }
+    .lubricant-item {
+      padding: 10px;
+    }
+  }
+  
+  
+  
+  @media (max-width: 480px) {
+    .brandbox {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  
+    .brandimg {
+      width: 80px !important;
+    }
+  }
+

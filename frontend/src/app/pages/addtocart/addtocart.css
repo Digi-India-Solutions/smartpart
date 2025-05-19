@@ -1,0 +1,95 @@
+/* General Styles */
+.cart-section {
+  padding: 20px;
+  background-color: black;
+}
+
+.cart-item {
+  /* margin-bottom: 20px; */
+}
+
+/* Image Responsiveness */
+.cart-img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Quantity Section */
+.quantity-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.quantity-btn {
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  border-radius: 5px;
+}
+
+.quantity-display {
+  padding: 0 15px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+ 
+/* Make text inside the country dropdown black */
+.iti__country-list, 
+.iti__country, 
+.iti__flag-container,
+.iti__selected-flag,
+.iti__country-name {
+  color: black !important;
+}
+
+/* Optional: Also make input text black */
+.iti input {
+  color: black !important;
+}
+
+
+
+
+
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .cart-img {
+    height: 120px;
+    width: auto;
+  }
+
+  .quantity-section {
+    flex-direction: row;
+  }
+
+  .quantity-btn {
+    margin-bottom: 0;
+  }
+
+  .subtotal-box {
+    width: 100%;
+  }
+
+  .total-section {
+    /* padding: 15px; */
+  }
+}
+
+@media (max-width: 576px) {
+  .cart-item {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .cart-img {
+    margin: 0 auto;
+  }
+
+  .subtotal-box {
+    text-align: center;
+  }
+}

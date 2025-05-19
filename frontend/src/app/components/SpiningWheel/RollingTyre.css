@@ -1,0 +1,22 @@
+@keyframes roll {
+    0% {
+        transform: translateX(0) rotate(0deg);
+    }
+    50% {
+        transform: translateX(calc(100vw - 160px)) rotate(540deg); /* Moves forward */
+    }
+    100% {
+        transform: translateX(0) rotate(0deg); /* Spins back in reverse */
+    }
+}
+
+.rolling-tyre {
+    animation: roll 6s ease-in-out infinite alternate; /* 'alternate' reverses rotation naturally */
+    width: 160px;
+    height: 160px;
+    left: 0;
+}
+.Rollingsec{
+    /* background-image: url("../../assets/background2.jpg"); */
+
+}

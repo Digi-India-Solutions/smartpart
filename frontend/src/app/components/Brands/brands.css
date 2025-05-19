@@ -1,0 +1,75 @@
+/* Global Styling */
+.brands-container {
+  padding: 20px 10px;
+  background: black;
+}
+
+.brandsec {
+  border: solid 2px gray;
+}
+
+.brand-item {
+  height:200px;
+  transition: transform 0.2s ease-in-out;
+  border: 1px solid lightgray;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  background-color: black;
+}
+
+.brand-item:hover {
+  cursor: pointer;
+  transform: scale(1.1);
+}
+
+.brandimg {
+  width: 100px;
+  height: auto;
+  object-fit: contain;
+}
+
+.brand-item p {
+  font-weight: 600;
+  margin-top: 10px;
+  text-transform: uppercase;
+  font-size: 16px;
+  color: white;
+  text-align: center;
+  margin-bottom: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .brandimg {
+    width: 90px;
+  }
+  .brand-item p {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  
+.brand-item {
+  height:100%;
+  padding: 10px;
+}
+  .brandimg {
+    width: 80px;
+  }
+  .brand-item p {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .brandimg {
+    width: 70px;
+  }
+  .brand-item p {
+    font-size: 10px;
+  }
+}

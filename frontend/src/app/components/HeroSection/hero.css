@@ -1,0 +1,39 @@
+.hero-section {
+  background-image: url("../../assets/background7.avif");
+  background-size: cover;
+  background-position: center;
+  border-bottom: solid 1px white;
+  width: 100%;
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.backgroundtrans {
+  background: transparent !important;
+}
+
+.breadcrumb-item a {
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    min-height: 200px;
+  }
+
+  .display-4 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section {
+    min-height: 150px;
+  }
+
+  .display-4 {
+    font-size: 1.5rem;
+  }
+}

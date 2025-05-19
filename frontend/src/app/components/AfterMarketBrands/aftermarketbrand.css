@@ -1,0 +1,172 @@
+/* Global Styling */
+.aftermarketbrands-container {
+  padding: 40px 0px;
+  background: black;
+}
+
+
+
+.aftermarketbrandsimg {
+  background-color: black;
+  width: 140px;
+  height: 80px;
+  padding: 0px;
+  object-fit: contain;
+  /* aspect-ratio: 1; */
+}
+
+.aftermarketbrands-item:hover {
+  cursor: pointer;
+  background-color: black;
+  transform: scale(1.1);
+  /* Increases the size by 20% */
+}
+
+.aftermarketbrands-item {
+  transition: transform 0.1s ease-in-out;
+  border: 1px solid lightgray;
+  justify-content: center;
+  display: grid;
+  padding: 20px;
+}
+
+.aftermarketbrands-item p{
+  font-weight: 600;
+  margin-top: 1rem;
+  text-transform: uppercase;
+  margin-bottom: 0;
+  font-size: 20px;
+
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .aftermarketbrands-item p{
+    font-size: 12px;
+  }
+  
+  .brandbox {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .aftermarketbrandsimg {
+    width: 80px;
+    height: 50px;
+  }
+}
+
+
+
+@media (max-width: 480px) {
+  .brandbox {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .brandimg {
+    width: 80px !important;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Improved Responsive Styles */
+/* .aftermarketbrandsection {
+    padding: 40px 20px;
+    background: black;
+  }
+  
+  .afterbrandtitle {
+    color: white;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .afterbrandsec {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    max-width: 1400px;
+    margin: auto;
+  }
+  
+  .subbrandImg {
+    max-width: 200px;
+    object-fit: contain;
+  }
+ .localbrand Image{
+  width:200px;
+  height:150px;
+ }
+
+
+  .localbrand{
+    width:150px;
+    height:150px;
+  }
+
+  .localbrand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease-in-out;
+    cursor: pointer;
+    padding: 10px;
+  }
+  
+  .localbrand:hover {
+    transform: scale(1.1);
+  }
+  
+  @media (max-width: 992px) {
+    .afterbrandsec {
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .afterbrandsec {
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    }
+  
+    .subbrandImg {
+      max-width: 80px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .afterbrandsec {
+      grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+    }
+  
+    .subbrandImg {
+      max-width: 70px;
+    }
+  }
+   */

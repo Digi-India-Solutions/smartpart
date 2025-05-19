@@ -1,0 +1,48 @@
+.categorySection1 {
+    background-image: url("../../assets/background2.jpg");
+    /* background: black; */
+    padding: 10px;
+
+}
+
+.categoriesPortion a {
+    text-decoration: none;
+    color: var(--black);
+    text-align: center;
+    padding: 10px;
+
+}
+
+.categoriesPortion {
+    width: 100%;
+    margin: 2px;
+    height: 90%;
+    border: 5px solid white;
+    border-radius: 20px;
+    transition: all 0.1s ease-in-out;
+}
+
+.categoriesPortion:hover {
+    transform: scale(1.06);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+
+.icon img {
+    height: auto;
+}
+
+@media only screen and (max-width:768px) {
+    .categoriesPortion {
+        width: 100%;
+        height: 90%;
+        margin: 1rem 0;
+        border: 2px solid white;
+    }
+
+    .categorySection1 {
+        padding: 0px;
+    }
+
+}

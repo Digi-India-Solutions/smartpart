@@ -1,0 +1,200 @@
+.paragraph {
+  font-size: 1rem;
+  line-height: 1.6;
+  /* text-align: justify; */
+  padding: 0;
+}
+
+.card-img-top {
+  object-fit: cover;
+}
+
+.aboutussec {
+  padding-top: 10px;
+  background: black;
+
+}
+
+.goal-card {
+  width: 80%;
+  height: 100%;
+  margin: auto !important;
+}
+
+/* General Styles */
+.aboutussec {
+  padding: 50px 0;
+}
+
+
+.text-warning {
+  color: #1f93ff !important;
+}
+
+/* Section Title Styles */
+h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* h2 span {
+  color: #f59e0b;
+} */
+
+/* Card Styles */
+.card {
+  margin-bottom: 30px;
+}
+
+/* Hero Section */
+.hero-section {
+  padding: 60px 0;
+}
+
+.card-img-top {
+  object-fit: contain;
+  background-color: #111;
+  height: 220px;
+  width: 100%;
+}
+
+.card-title {
+  font-weight: 600;
+}
+
+.card-text {
+  font-size: 0.95rem;
+}
+
+.btn-warning {
+  background-color: #f59e0b;
+  border: none;
+}
+
+.btn-warning:hover {
+  background-color: #e3960a;
+}
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+
+  /* Stacking the columns */
+  .container {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .card img {
+    height: 150px;
+    width: 100%;
+  }
+
+  .card {
+
+    width: 100% !important;
+  }
+
+  .row {
+    display: block;
+  }
+
+  /* Adjusting image sizes */
+  .img-fluid {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Padding and margins for mobile screens */
+  .paragraph {
+    font-size: 0.95rem;
+    /* padding: 0 15px; */
+  }
+
+  .enginpic1 {
+    width: 300px;
+    height: auto;
+    object-fit: cover;
+  }
+
+  .enginpic2 {
+    width: 90%;
+    height:100%;
+  }
+
+  /* Card image resizing */
+  .card-img-top {
+    height: 180px;
+  }
+
+  /* Text Centering */
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  /* Adjusting margins for better space */
+  .m-3 {
+    margin: 15px !important;
+  }
+
+  .mt-2,
+  .mt-5 {
+    margin-top: 15px;
+  }
+}
+
+@media (min-width: 768px) {
+
+  /* For medium and larger screens, maintain standard layouts */
+  .aboutussec {
+    padding: 80px 0;
+  }
+
+  h2 {
+    font-size: 2.2rem;
+  }
+
+  .paragraph {
+    font-size: 1.1rem;
+  }
+
+  /* Card Layout on larger screens */
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  /* .col-md-4 {
+      flex: 0 0 33.3333%;
+    }
+  
+    .col-md-6 {
+      flex: 0 0 50%;
+    } */
+
+  /* Adjusting image size for larger screens */
+  .card-img-top {
+    height: 250px;
+  }
+}
+
+@media (min-width: 1200px) {
+
+  /* For larger screens (desktops) */
+  .container {
+    max-width: 1200px;
+  }
+
+  h2 {
+    font-size: 2.5rem;
+  }
+
+  .paragraph {
+    font-size: 1.2rem;
+  }
+
+  .card-img-top {
+    height: 280px;
+  }
+}

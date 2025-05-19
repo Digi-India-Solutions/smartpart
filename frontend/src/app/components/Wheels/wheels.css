@@ -1,0 +1,59 @@
+/* Global Styling */
+.Wheel-container {
+  padding: 40px 0px;
+  background: black;
+}
+
+
+
+.Wheelimg {
+  background-color: black;
+  width: 120px;
+  height: 80px;
+  padding: 0px;
+  object-fit: contain;
+  /* aspect-ratio: 1; */
+}
+
+.Wheel-item:hover {
+  cursor: pointer;
+  background-color: black;
+  transform: scale(1.1);
+  /* Increases the size by 20% */
+}
+
+.Wheel-item {
+  transition: transform 0.1s ease-in-out;
+  border: 1px solid lightgray;
+  justify-content: center;
+  display: grid;
+  padding: 20px;
+}
+
+.Wheel-item p{
+  font-weight: 600;
+  margin-top: 1rem;
+  text-transform: uppercase;
+  margin-bottom: 0;
+  font-size: 20px;
+
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .Wheel-item p{
+    font-size: 12px;
+  }
+  
+  .brandbox {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .Wheelimg {
+    width: 80px;
+    height: 50px;
+  }
+  .Wheel-item{
+    padding: 10px;
+  }
+}

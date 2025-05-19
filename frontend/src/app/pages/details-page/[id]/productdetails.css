@@ -1,0 +1,113 @@
+.Detail-product-contain {
+  
+    padding: 20px;
+    /* max-width: 1200px; */
+    margin: auto;
+  }
+  
+  .Detail-product-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .Detail-product-image{
+         display: flex;
+        align-items: center;
+        justify-content: center;
+  }
+  
+  .Detail-product-image img {
+
+
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+  }
+  
+  .Detail-product {
+    text-align: center;
+
+  }
+  
+  .Detail-product-name {
+    color: blue;
+    font-weight: bold;
+  }
+  
+  .Detail-product-title {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .Detail-product-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  
+  .Detail-product-buttons button {
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .facebook { background-color: #1877f2; color: white; }
+  .twitter { background-color: #1da1f2; color: white; }
+  .whatsapp { background-color: #25d366; color: white; }
+  
+  .unlock-price {
+    width: 100%;
+    padding: 10px;
+    background-color: blue;
+    color: white;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  
+  .reviews-heading {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 22px;
+  }
+  
+  .reviews-heading span {
+    color: orange;
+  }
+  
+/* Make text inside the country dropdown black */
+.iti__country-list, 
+.iti__country, 
+.iti__flag-container,
+.iti__selected-flag,
+.iti__country-name {
+  color: black !important;
+}
+
+/* Optional: Also make input text black */
+.iti input {
+  color: black !important;
+}
+
+
+  /* Responsive Design */
+  @media (min-width: 768px) {
+    .Detail-product-wrapper {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+  
+    .Detail-product {
+      text-align: left;
+      flex: 1;
+    }
+  
+    .Detail-product-image {
+      flex: 1;
+    }
+  }
+  

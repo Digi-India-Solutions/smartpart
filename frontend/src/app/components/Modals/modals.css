@@ -1,0 +1,17 @@
+.highlighttext{
+  font-size: 2rem;
+}
+
+.modalSection{
+  /* background-image: url("../../assets/background2.jpg"); */
+  padding:0px;
+  align-items: center;
+  height: 350px;
+ /* border:solid 10px gray; */
+}
+
+@media only screen and (max-width:768px) {
+  .modalSection{
+    height: unset;
+  }
+}

@@ -1,0 +1,14 @@
+.allowed{
+    cursor: pointer;
+}
+.not-allowed{
+    cursor: not-allowed;
+}
+.circle-color{
+    height: 20px;
+    width: 100%;
+}
+
+.bg-theme{
+background-color: #718096;
+}

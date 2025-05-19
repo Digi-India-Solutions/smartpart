@@ -1,0 +1,225 @@
+:root {
+    --bg-gradient: linear-gradient(135deg, #1c1c1c, #4a5568);
+    --card-bg: rgba(255, 255, 255, 0.1);
+    --card-shadow: rgba(0, 0, 0, 0.2);
+    --color-primary: #0266ff;
+    --color-light: #fff;
+    --input-bg: #ffffff;
+    --input-border: #cccccc;
+    --login-button-bg: #0266ff;
+    --login-button-hover: #004ccf;
+  }
+  
+  .main-login {
+    min-height: 100vh;
+    background: var(--bg-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  .login-container {
+    background: var(--card-bg);
+    padding: 40px;
+    border-radius: 15px;
+    width: 100%;
+    max-width: 400px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 25px var(--card-shadow);
+    color: var(--color-light);
+    text-align: center;
+  }
+  
+  .login-title {
+    font-size: 28px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #556173;
+  }
+  
+  .login-subtitle {
+    font-size: 14px;
+    margin-bottom: 30px;
+    color: #cfd8dc;
+  }
+  
+  .login-form .form-group {
+    text-align: left;
+    margin-bottom: 20px;
+  }
+  
+  .login-form label {
+    display: block;
+    margin-bottom: 6px;
+    color: #e0f7fa;
+    font-weight: 500;
+  }
+  
+  .login-form .form-control {
+    width: 100%;
+    padding: 10px 15px;
+    border-radius: 25px;
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
+    color: #333;
+    font-size: 16px;
+    outline: none;
+  }
+  
+  .show-password {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+    font-size: 14px;
+    color: #90caf9;
+  }
+  
+  .show-password input[type="checkbox"] {
+    margin-right: 8px;
+  }
+  
+  .login-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #718096;
+    border: none;
+    border-radius: 25px;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .login-button:hover {
+    background-color: #718096;
+  }
+  
+  .forgot-password,
+  .signup-link {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #4fc3f7;
+    text-decoration: none;
+  }
+  
+  .forgot-password:hover,
+  .signup-link:hover {
+    text-decoration: underline;
+  }
+  
+  @media (max-width: 500px) {
+    .login-container {
+      padding: 30px 20px;
+      max-width: 90%;
+    }
+  }
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* .show-password {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+    font-size: 0.875em;
+    color: var(--color-blue);
+}
+
+.show-password input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+
+:root {
+    --bg-head: #929292ca;
+    --bg-greenblue: #666666;
+    --bg-light-green: #b5e7e6;
+    --bg-light-greenblue: #ddf3f2;
+    --bg-dark-blue: #003873;
+    --color-blue: #4377a2;
+    --color-blue-light: #438bf0;
+  }
+  .main-login{
+    background: var(--bg-head);
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+  }
+.login-container {
+    background-color: var(--bg-head);
+    border: 1px solid var(--color-blue-light);
+    border-radius: 8px;
+    padding: 40px;
+    max-width: 400px;
+    min-width: 400px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-title {
+    color: var(--bg-dark-blue);
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.login-form .form-group {
+    margin-bottom: 15px;
+}
+
+.login-form label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--color-blue);
+}
+
+.login-form .form-control {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--color-blue-light);
+    border-radius: 4px;
+}
+
+.error-text {
+    color: red;
+    font-size: 0.875em;
+}
+
+.login-button {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--bg-greenblue);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+.login-button:hover {
+    background-color: var(--color-blue-light);
+}
+
+@media only screen and (max-width:500px) {
+    .login-container {
+        min-width: auto;
+        width: 90%;
+        
+    }
+} */
