@@ -1,39 +1,48 @@
-// src/Components/AddBanner/AddBanner.js
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { addBanner } from '../../Slice/Banner/bannerSlice';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { postData } from '../../services/FetchNodeServices';
 
 const AddBanner = () => {
-    const [image, setImage] = useState(null);
-    const loading = useSelector((state) => state.banner.loading);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const loading = useSelector((state) => state.banner.loading);
 
-    const getFileData = (e) => {
-        setImage(e.target.files[0]);
+    const [formData, setFormData] = useState({
+        name: '',
+        heading: '',
+        sub_heading: '',
+        slider_link: '',
+        status: '1',
+    });
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
     };
-
-    const postData = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if(image.size > 2048576) {
-            toast.error('File size exceeds 2MB');
-            return;
+        const submissionData = { name: formData.name, heading: formData.heading, sub_heading: formData.sub_heading, slider_link: formData.slider_link, status: formData.status };
+
+        const res = await postData("banner/create-banner", submissionData)
+        if (res.status) {
+            toast.success("Banner added successfully!");
+            navigate('/all-banners');
+        } else {
+            toast.error(res.message);
         }
-        const formData = new FormData();
-        formData.append('image', image);
-        dispatch(addBanner(formData))
-            .unwrap()
-            .then(() => {
-                toast.success('New Banner is created');
-                navigate('/all-banners');
-            })
-            .catch((error) => {
-                toast.error(`Error: ${error.message}`);
-            });
     };
+    console.log("VVV", formData);
+    // Input fields config
+    const fields = [
+        { name: 'name', label: 'Name', type: 'text' },
+        { name: 'heading', label: 'Heading', type: 'text' },
+        { name: 'sub_heading', label: 'Sub Heading', type: 'text' },
+        { name: 'slider_link', label: 'Slider Link', type: 'url' },
+    ];
 
     return (
         <>
@@ -43,26 +52,51 @@ const AddBanner = () => {
                     <h4>Add Banner</h4>
                 </div>
                 <div className="links">
-                    <Link to="/all-banners" className="add-new">Back <i className="fa-regular fa-circle-left"></i></Link>
+                    <Link to="/all-banners" className="add-new">
+                        Back <i className="fa-regular fa-circle-left"></i>
+                    </Link>
                 </div>
             </div>
+
             <div className="d-form">
-                <form onSubmit={postData}>
-                <div className="mb-2">
-                        <label htmlFor="productText" className="form-label">Banner Tittle <sup className='text-danger'>*</sup></label>
-                        <input type="text" name="image" id="productText" className="form-control" onChange={getFileData} />
-                    </div>
-                    <div className="mb-2">
-                        <label htmlFor="productSubText" className="form-label">Banner Sub-Tittle <sup className='text-danger'>*</sup></label>
-                        <input type="text" name="image" id="productSubText" className="form-control" onChange={getFileData} />
+                <form onSubmit={handleSubmit} encType="multipart/form-data">
+                    <div className="row">
+                        {fields.map(({ name, label, type }, index) => (
+                            <div className="col-md-6 mb-3" key={name}>
+                                <label htmlFor={name} className="form-label">
+                                    {label} <sup className="text-danger">*</sup>
+                                </label>
+                                <input
+                                    type={type}
+                                    id={name}
+                                    name={name}
+                                    className="form-control"
+                                    value={formData[name]}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                        ))}
                     </div>
 
-                    <div className="mb-2">
-                        <label htmlFor="productImage" className="form-label">Banner Image <sup className='text-danger'>*</sup></label>
-                        <input type="file" name="image" id="productImage" className="form-control" onChange={getFileData} />
+                    <div className="col-md-6 mb-3">
+                        <label htmlFor="status" className="form-label">
+                            Status <sup className="text-danger">*</sup>
+                        </label>
+                        <select
+                            id="status"
+                            name="status"
+                            className="form-control"
+                            value={formData.status}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
                     </div>
                     <button type="submit" className="mybtnself" disabled={loading}>
-                        {loading ? 'Loading...' : 'Add Banner'}
+                        {loading ? 'Uploading...' : 'Add Banner'}
                     </button>
                 </form>
             </div>

@@ -1,67 +1,107 @@
-"use client"
-import React, { useEffect, useState } from 'react'
-import './pageblog.css'
-import Image from 'next/image'
-import pic1 from '@/app/assets/banner8.jpg'
+"use client";
 
+import React, { useEffect, useState } from 'react';
+import './pageblog.css';
+import Image from 'next/image';
+import { useParams } from 'next/navigation';
+import { getData, serverURL } from '@/app/services/FetchNodeServices';
+import parse from 'html-react-parser';
+import pic1 from '@/app/assets/banner8.jpg';
 
 const Page = () => {
-    const [date, setDate] = useState('');
+  const { id } = useParams();
+  const [blog, setBlog] = useState(null);
+  const [date, setDate] = useState('');
 
-    useEffect(() => {
-      const formattedDate = new Date().toLocaleDateString();
-      setDate(formattedDate);
-    }, []);
+  useEffect(() => {
+    const fetchBlog = async () => {
+      try {
+        const res = await getData(`blog/get-all-blog-by-id/${id}`);
+        if (res?.data) {
+          setBlog(res.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch blog:', error);
+      }
+    };
+
+    if (id) {
+      fetchBlog();
+    }
+  }, [id]);
+
+  useEffect(() => {
+    const formattedDate = new Date().toLocaleDateString();
+    setDate(formattedDate);
+  }, []);
+
+  if (!blog) {
+    return <div className="text-light p-4">Loading blog details...</div>;
+  }
+
+  const imageUrl =
+    blog?.image && blog.image.startsWith('uploads')
+      ? `${serverURL}/${blog.image}`
+      : `${serverURL}/uploads/images/${blog?.image}`;
+
   return (
     <>
-  <section className='blog-detail bg-dark'>
-      <div className="container">
-        <div className="blog-header">
-          <h1 className='blog-title'>
-            Hyundai Spare Parts - Indian Exporter of Automotive Parts
-          </h1>
-          <div className="blog-meta">
-            <span className='badge category'>Automotive</span>
-            <span className='date'>{date}</span>
+      <section className="blog-detail bg-dark">
+        <div className="container">
+          <div className="blog-header">
+            <h1 className="blog-title">{blog.title}</h1>
+            <div className="blog-meta">
+              <span className="badge category">Automotive</span>
+              <span className="date">{date}</span>
+            </div>
+
+            <Image
+              src={imageUrl}
+              width={1000}
+              height={400}
+              alt="Blog Banner"
+              className="banner-img"
+              priority
+              onError={(e) => {
+                e.target.src = pic1.src;
+              }}
+            />
           </div>
-          <Image src={pic1} alt='Hyundai Spare Parts Banner' className='banner-img' priority />
+
+          <div className="blog-content text-light">
+            {typeof blog?.descri === 'string' && (
+              <div
+                // style={{
+                //   display: '-webkit-box',
+                //   WebkitLineClamp: 3,
+                //   WebkitBoxOrient: 'vertical',
+                //   overflow: 'hidden',
+                //   textOverflow: 'ellipsis'
+                // }}
+              >
+                {parse(blog.descri)}
+              </div>
+            )}
+
+            {typeof blog?.description2 === 'string' && (
+              <div
+                // style={{
+                //   display: '-webkit-box',
+                //   WebkitLineClamp: 3,
+                //   WebkitBoxOrient: 'vertical',
+                //   overflow: 'hidden',
+                //   textOverflow: 'ellipsis',
+                //   marginTop: '1rem'
+                // }}
+              >
+                {parse(blog.description2)}
+              </div>
+            )}
+          </div>
         </div>
-
-        <div className="blog-content">
-          <p>
-            At our core, we are committed to delivering high-quality Hyundai spare parts to global markets.
-            As one of the leading Indian exporters of automotive components, we pride ourselves on a wide inventory,
-            top-notch customer support, and a mission to power vehicles with genuine parts.
-          </p>
-
-          <p>
-            Our portfolio includes everything from engine components, suspension parts, electricals, to body parts.
-            We ensure that each part meets international standards and offers long-lasting durability.
-          </p>
-
-          <h3>Why Choose Us?</h3>
-          <ul>
-            <li>✔️ Genuine OEM & aftermarket Hyundai parts</li>
-            <li>✔️ Fast global shipping</li>
-            <li>✔️ Bulk order support with attractive pricing</li>
-            <li>✔️ Trusted by over 1000+ clients worldwide</li>
-          </ul>
-
-          <p>
-            Whether you re a mechanic, a distributor, or a retail customer, our expert team ensures you receive the best parts with full satisfaction.
-          </p>
-        </div>
-      </div>
-    </section>
-     <section>
-          
-      
-
-     </section>
-
+      </section>
     </>
-
-  )
-}
+  );
+};
 
 export default Page;

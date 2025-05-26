@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import './localComapniesbrand.css';
 
@@ -48,6 +48,7 @@ import subbrand37 from '@/app/assets/localcompany/logo7.png';
 import subbrand38 from '@/app/assets/localcompany/logo8.png';
 import subbrand39 from '@/app/assets/localcompany/logo4.png';
 import Link from 'next/link';
+import { getData, serverURL } from '@/app/services/FetchNodeServices';
 
 
 
@@ -95,18 +96,36 @@ const brands = [
 ]
 
 const Brands = () => {
+
+  const [brand, setBrand] = useState([])
+  
+    const fetchBrand = async () => {
+      //   try {
+      const res = await getData("brand/get-all-brand");
+      console.log("Brand Data:", res?.data);
+      setBrand(res?.data);
+      //   } catch (error) {
+      //     console.log(error);
+      //   }
+    }
+  
+    useEffect(() => {
+      fetchBrand()
+    }, [])
+    const filterData = brand.filter((item) => item.brand_category_name === 'TOP AFTERMARKETS BRANDS'&& item?.status===1)
+    console.log("FRONEND_DATA:-", filterData)
   return (
     <>
       <section className="local-container">
         <h2 className="text-center">TOP  <span className="text-theme bouncing-text"> AFTERMARKETS BRANDS</span></h2>
         <div className="container">
           <div className='row justify-content-center'>
-            {brands.map((item, index) =>
+            {filterData?.map((item, index) =>
               <div key={index} className="col-md-2 col-4 p-0">
-                <Link href="/pages/all-products" className='text-decoration-none text-dark'>
+                <Link href={`/pages/all-products/${item?.id}`} className='text-decoration-none text-dark'>
                 <div className='local-item'>
                   <div className='d-flex justify-content-center'>
-                  <Image className="localimg" src={item.src} alt={item.alt} />
+                  <Image className="brandimg" src={`${serverURL}/uploads/images/${item?.image}` || item?.image || `${serverURL}/${item?.image}`} width={100} height={100} alt={item?.name} />
                   </div>
                   <p className='text-center'>
                     {item.name}

@@ -1,120 +1,120 @@
-import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import JoditEditor from "jodit-react";
+import axios from "axios";
+import "react-toastify/dist/ReactToastify.css";
+import { getData, postData } from "../../services/FetchNodeServices";
+
+const fieldConfig = [
+  { name: "name", label: "Product Name", type: "text", required: true },
+  { name: "model", label: "Model", type: "text" },
+  { name: "part_no", label: "Part No", type: "text" },
+  { name: "warranty", label: "Warranty", type: "text" },
+  { name: "price", label: "Price", type: "number" },
+  { name: "special_price", label: "Special Price", type: "number" },
+  { name: "image", label: "Image", type: "file" },
+  { name: "product_description", label: "Product Description", type: "editor" },
+  { name: "meta_title", label: "Meta Title", type: "text" },
+  { name: "meta_description", label: "Meta Description", type: "textarea" },
+  { name: "meta_keyword", label: "Meta Keyword", type: "text" },
+  { name: "status", label: "Status", type: "checkbox" },
+  { name: "trending", label: "Trending", type: "checkbox" },
+
+];
 
 const AddProduct = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
   const editor = useRef(null);
-  const [catedata, setCatedata] = useState([]);
-  const [subcatedata, setSubcatedata] = useState([]);
-  const [active, setActive] = useState(false);
-  const getApiData = async () => {
-    try {
-      let res = await axios.get("http://localhost:8000/api/category");
-      setCatedata(res.data.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const getApiSubData = async (categoryName) => {
-    try {
-      let res = await axios.get("http://localhost:8000/api/subcategory");
-      // Filter subcategories based on selected category
-      const filteredSubcategories = res.data.data.filter(
-        (item) => item.categoryname === categoryName
-      );
-      setSubcatedata(filteredSubcategories);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const [loading, setLoading] = useState(false);
+  const [categoryList, setCategoryList] = useState([]);
+  const [brandList, setBrandList] = useState([]);
+  const [brandFilter, setBrandFilter] = useState([]);
 
   const [data, setData] = useState({
-    categoryname: "",
-    subcategoryName: "",
-    productname: "",
-    details: "",
-    image1: "",
-    image2: "",
-    image3: "",
-    tableData: "",
-    active: false,
+    name: "", category: "", brand: "", trending: false, warranty: "", product_description: "", meta_title: "",
+    meta_description: "", meta_keyword: "", model: "", part_no: "", price: "", special_price: "", status: false,
+    image: null,
   });
 
-  const getInputData = (e) => {
-    const { name, value } = e.target;
-    setData({ ...data, [name]: value });
+  useEffect(() => {
+    fetchCategories();
+    fetchBrands();
+  }, []);
 
-    // If the category is selected, fetch the related subcategories
-    if (name === "categoryname") {
-      getApiSubData(value);
+  const fetchCategories = async () => {
+    try {
+      const res = await getData("category/get-all-categorys");
+      setCategoryList(res.data);
+    } catch (err) {
+      console.error("Error fetching categories:", err);
     }
   };
 
-  const getInputfile = (e) => {
-    const { name, files } = e.target;
-    setData({ ...data, [name]: files[0] });
-  };
-
-  const postData = async (e) => {
-    e.preventDefault();
+  const fetchBrands = async () => {
     try {
-      const files = [data.image1, data.image2, data.image3];
-
-      const tooLarge = files.some(
-        (file) => file && file.size > 2 * 1024 * 1024
-      );
-      
-      if (tooLarge) {
-        toast.error("File size should be less than 2MB");
-        return; 
-      }
-
-      const formData = new FormData();
-      formData.append("categoryname", data.categoryname);
-      formData.append("subcategoryName", data.subcategoryName);
-      formData.append("details", data.details);
-      formData.append("productname", data.productname);
-      formData.append("image1", data.image1);
-      formData.append("image2", data.image2);
-      formData.append("image3", data.image3);
-      formData.append("partNumber", data.partNumber);
-      formData.append("tableData", data.tableData);
-      formData.append("active", active);
-      setLoading(true);
-      const res = await axios.post(
-        "http://localhost:8000/api/product",
-        formData
-      );
-      if (res.status === 200) {
-        toast.success("New Product created");
-        navigate("/all-products");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setLoading(false);
+      const res = await getData("brand/get-all-brand");
+      setBrandList(res.data);
+    } catch (err) {
+      console.error("Error fetching brands:", err);
     }
   };
 
   useEffect(() => {
-    getApiData();
-  }, []);
+    // Filter categories based on selected brand
+    if (data.category) {
+      const filtered = brandList.filter(cat => cat?.cat_id == data?.category);
+      setBrandFilter(filtered);
+    } else {
+      setBrandFilter([]);
+    }
+  }, [data.category, brandList]);
+  // console.log("DDDDDDD:--", data.brand);
+  // console.log("DDDDDDD:--", data.brand);
+  const handleChange = (e) => {
+    const { name, value, type, checked, files } = e.target;
+    const val = type === "checkbox" ? checked : type === "file" ? files[0] : value;
+
+    setData((prev) => ({
+      ...prev,
+      [name]: val,
+    }));
+  };
 
   const handleEditorChange = (content) => {
-    setData({ ...data, tableData: content });
+    setData((prev) => ({ ...prev, product_description: content }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    postData(e);
-  };
 
+    if (data.image && data.image.size > 2 * 1024 * 1024) {
+      toast.error("File size should be less than 2MB");
+      return;
+    }
+
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+    if (data.image) formData.append('image', data.image.file);
+
+    try {
+      setLoading(true);
+      const res = await postData("product/create-product", formData);
+      console.log("DATA:-", res);
+      if (res.status === true) {
+        toast.success("Product created successfully!");
+        navigate("/all-products");
+      }
+    } catch (err) {
+      toast.error("Something went wrong!");
+      console.error("Submit error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  console.log("DATADATA:-", data);
   return (
     <>
       <ToastContainer />
@@ -132,167 +132,74 @@ const AddProduct = () => {
       <div className="d-form">
         <form onSubmit={handleSubmit} className="mt-4">
           <div className="row">
-            <div className="col-md-4">
-              <label htmlFor="">
-                Product Name <sup className="text-danger">*</sup>
-              </label>
-              <input
-                type="text"
-                name="productname"
-                onChange={getInputData}
-                value={data.productname}
-                className="form-control"
-                placeholder="Product name"
-                required
-              />
-            </div>
+            {/* Category Dropdown */}
             <div className="col-md-4 mb-3">
-              <label htmlFor="category">
-                Select Category <sup className="text-danger">*</sup>
-              </label>
-              <select
-                name="categoryname"
-                onChange={getInputData}
-                className="form-control"
-                required
-              >
-                <option disabled selected>
-                  Choose Category
-                </option>
-                {catedata.map((item, index) => (
-                  <option key={index} value={item.categoryname}>
-                    {item.categoryname}
+              <label>Category <sup className="text-danger">*</sup></label>
+              <select name="category" className="form-control" value={data.category} onChange={handleChange} required>
+                <option value="">Select Category</option>
+                {categoryList.map((cat) => (
+                  <option key={cat._id} value={cat.id}>
+                    {cat.name}
                   </option>
                 ))}
               </select>
             </div>
+
+            {/* Brand Dropdown */}
             <div className="col-md-4 mb-3">
-              <label htmlFor="category">
-                Select SubCategory <sup className="text-danger">*</sup>
-              </label>
-              <select
-                name="subcategoryName"
-                onChange={getInputData}
-                className="form-control"
-                required
-              >
-                <option disabled selected>
-                  Choose SubCategory
-                </option>
-                {subcatedata.map((item, index) => (
-                  <option key={index} value={item.subcategoryName}>
-                    {item.subcategoryName}
+              <label>Brand <sup className="text-danger">*</sup></label>
+              <select name="brand" className="form-control" value={data.brand} onChange={handleChange} required>
+                <option value="">Select Brand</option>
+                {brandFilter?.map((brand) => (
+                  <option key={brand?._id} value={brand?.id}>
+                    {brand?.name}
                   </option>
                 ))}
               </select>
             </div>
-            <div className="col-md-12 mb-3">
-              <label htmlFor="details">
-                Product Details <sup className="text-danger">*</sup>
-              </label>
-              <textarea
-                name="details"
-                value={data.details}
-                required
-                onChange={getInputData}
-                className="form-control"
-                placeholder="Product details"
-              ></textarea>
+
+            {/* Other fields */}
+            {fieldConfig?.map((field) => {
+              if (field?.name === "category" || field.name === "brand") return null;
+
+              return (
+                <div className={field.type === "editor" ? `col-md-12 mb-12` : `col-md-4 mb-3`} key={field.name}>
+                  <label htmlFor={field.name}>
+                    {field.label}{" "}
+                    {field.required && <sup className="text-danger">*</sup>}
+                  </label>
+                  {field.type === "textarea" ? (
+
+                    <textarea className="form-control" name={field.name} value={data[field.name] || ""} onChange={handleChange} required={field.required} />
+
+                  ) : field.type === "checkbox" ? (
+
+                    <input type="checkbox" className="form-check-input" name={field.name} checked={data[field.name] || false} onChange={handleChange} />
+
+                  ) : field.type === "editor" ? (
+
+                    <JoditEditor ref={editor} value={data[field.name] || ""} onChange={handleEditorChange} />
+
+                  ) : field.type === "file" ? (
+
+                    <input type="file" name={field.name} onChange={handleChange} className="form-control" />
+
+                  ) : (
+
+                    <input type={field.type} className="form-control" name={field.name} value={data[field.name] || ""} onChange={handleChange} required={field.required} />
+
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+            <div style={{ width: "30%" }}>
+              <button type="submit" className="mybtnself mt-4" style={{ marginBottom: 100, }}>
+                {loading ? "Please wait..." : "Add New Product"}
+              </button>
             </div>
           </div>
-          <div className="row">
-            {/* File input fields */}
-            <div className="col-md-3 mb-3">
-              <label htmlFor="pic1" className="form-label">
-                Picture 1: <sup className="text-danger">*</sup>
-              </label>
-              <input
-                type="file"
-                name="image1"
-                onChange={getInputfile}
-                className="form-control"
-                required
-              />
-            </div>
-            <div className="col-md-3 mb-3">
-              <label htmlFor="pic2" className="form-label">
-                Picture 2: <sup className="text-danger">*</sup>
-              </label>
-              <input
-                type="file"
-                name="image2"
-                onChange={getInputfile}
-                className="form-control"
-                required
-              />
-            </div>
-            <div className="col-md-3 mb-3">
-              <label htmlFor="pic3" className="form-label">
-                Picture 3: <sup className="text-danger">*</sup>
-              </label>
-              <input
-                type="file"
-                name="image3"
-                onChange={getInputfile}
-                className="form-control"
-                required
-              />
-            </div>
-            <div className="col-md-3 mb-3">
-              <label htmlFor="pic4" className="form-label">
-              Part Number : <sup className="text-danger">*</sup>
-              </label>
-              <input
-                type="Text"
-                name="partNumber"
-                onChange={getInputData}
-                className="form-control"
-                placeholder="Part-Number / Code"
-                required
-              />
-            </div>
-          </div>
-          <div className="">
-            <label>
-              Product Details: <sup className="text-danger">*</sup>
-            </label>
-            <JoditEditor
-              ref={editor}
-              value={data.tableData}
-              onChange={handleEditorChange}
-              placeholder="Enter product details here..."
-              required
-            />
-          </div>
-          {/* <div
-            style={{
-              marginTop: 20,
-              marginBottom: 20,
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              fontSize: "16px",
-              fontWeight: "500",
-              color: "#333",
-            }}
-          >
-            <input
-              type="checkbox"
-              name="active"
-              id="active"
-              checked={active}
-              onChange={(e) => setActive(e.target.checked)}
-              style={{ width: "16px", height: "16px" }}
-            />
-            <label htmlFor="active">New Product Launch</label>
-          </div> */}
-          <button
-            type="submit"
-            className="mybtnself mt-2"
-            style={{ marginBottom: 100 }}
-          >
-            {loading ? "Please wait...." : "Add New Product"}
-          </button>
         </form>
       </div>
     </>

@@ -145,6 +145,12 @@ General Styles
   color: #fffdfd;
   margin-bottom: 10px;
   flex-grow: 1;
+  
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .Allproduct-part {
@@ -213,4 +219,12 @@ General Styles
   .products-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.filter-scroll {
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
 }

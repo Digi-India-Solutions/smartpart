@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link';
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import pic10 from '@/app/assets/Wheelers/makino.png'
 import pic9 from '@/app/assets/Wheelers/local3.jpeg'
 import pic4 from '@/app/assets/Wheelers/local4.png'
@@ -26,6 +26,7 @@ import img5 from '@/app/assets/icons/honda.webp'
 import img6 from '@/app/assets/icons/hero.webp'
 import img7 from '@/app/assets/Wheelers/ashok layland.png'
 import img8 from '@/app/assets/Wheelers/piaggio.png'
+import { getData, serverURL } from '@/app/services/FetchNodeServices';
 // import VideoSection from '../Videosec/page';
 
 // import SpiningWheel from '@/app/components/SpiningWheel/page'
@@ -61,15 +62,29 @@ const subbrands = [
 
 ];
 
-
-
-
-
-
-
-
-
 const page = () => {
+  const [brand, setBrand] = useState([])
+
+  const fetchBrand = async () => {
+    //   try {
+    const res = await getData("brand/get-all-brand");
+    console.log("Brand Data:", res?.data);
+    setBrand(res?.data);
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+  }
+
+  useEffect(() => {
+    fetchBrand()
+  }, [])
+
+
+  const filterData = brand.filter((item) => item?.brand_category_name === 'TOP 2/3 WHEELERS BRANDS' && item?.status===1)
+  const filterData2 = brand.filter((item) => item?.brand_category_name === '2/3 WHEELERS AFTERMARKET BRANDS' && item?.status===1)
+  console.log("FRONEND_DATA:-", filterData2)
+
+  
   return (
     <>
 
@@ -79,12 +94,12 @@ const page = () => {
         <h2 className="text-center">TOP  <span className="text-theme bouncing-text">2/3 WHEELERS</span></h2>
         <div className="container">
           <div className='row justify-content-center'>
-            {Wheeler.map((item, index) =>
+            {filterData?.map((item, index) =>
               <div key={index} className="col-md-2 col-4 p-0">
-                <Link href="/pages/all-products" className='text-decoration-none text-dark'>
+                <Link href={`/pages/all-products/${item?.id}`} className='text-decoration-none text-dark'>
                 <div className='Wheel-item'>
                   <div className='d-flex justify-content-center'>
-                  <Image className="Wheelimg" src={item.src} alt={item.alt} />
+                   <Image className="brandimg" src={`${serverURL}/uploads/images/${item?.image}` || item?.image || `${serverURL}/${item?.image}`} width={100} height={100} alt={item?.name} />
                   </div>
                   <p className='text-center'>
                     {item.name}
@@ -104,15 +119,15 @@ const page = () => {
       <h2 className='tyertitle text-center'>2/3 <span className='text-theme bouncing-text'> WHEELERS AFTERMARKET </span></h2>
         <div className="container">
           <div className='row justify-content-center'>
-            {subbrands.map((item, index) =>
+            {filterData2.map((item, index) =>
               <div key={index} className="col-md-2 col-4 p-0">
                 <Link href="/pages/all-products" className='text-decoration-none text-dark'>
                 <div className='Wheel-item'>
                   <div className='d-flex justify-content-center'>
-                  <Image className="Wheelimg" src={item.src} alt={item.alt} />
+                  <Image className="brandimg" src={`${serverURL}/uploads/images/${item?.image}` || item?.image || `${serverURL}/${item?.image}`} width={100} height={100} alt={item?.name} />
                   </div>
                   <p className='text-center'>
-                    {item.name}
+                    {item?.name}
                   </p>
                 </div>
                 </Link>

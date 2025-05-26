@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { postData } from '../../services/FetchNodeServices';
 
 const EditVoucher = () => {
     const { id } = useParams();
@@ -56,14 +57,12 @@ const EditVoucher = () => {
         }
 
         try {
-            const response = await axios.put(`http://localhost:8000/api/new-lanch/${id}`, data, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-            toast.success(response.data.message);
-            setIsLoading(false);
-            navigate("/all-voucher");
+            const response = await postData(`product/update-product/${id}`, data);
+            if (response?.status) {
+                toast.success(response?.message);
+                setIsLoading(false);
+                navigate("/all-voucher");
+            }
         } catch (error) {
             toast.error(error.response?.data?.message || "Error updating voucher");
             setIsLoading(false);

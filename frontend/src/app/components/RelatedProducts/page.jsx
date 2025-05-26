@@ -50,6 +50,7 @@ const RelatedProductsPage = () => {
       {relatedProduct.map((product, index) => (
         <ProductCard key={product.id} {...product} index={index} />
       ))}
+      
     </section>
   );
 };

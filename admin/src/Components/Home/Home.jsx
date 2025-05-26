@@ -12,9 +12,9 @@ import EditProduct from '../../Pages/Products/EditProduct'
 import AllBanner from '../../Pages/Banners/AllBanner'
 import AddBanner from '../../Pages/Banners/AddBanner'
 import EditBanner from '../../Pages/Banners/EditBanner'
-import AllShopBanner from '../../Pages/ShopBanner/AllShopBanner'
-import AddShopBanner from '../../Pages/ShopBanner/AddShopBanner'
-import EditShopBanner from '../../Pages/ShopBanner/EditShopBanner'
+import AllBrand from '../../Pages/Brands/AllBrand'
+import AddBrand from '../../Pages/Brands/AddBrand'
+import EditBrand from '../../Pages//Brands/EditBrand'
 import AllTags from '../../Pages/Tags/AllTags'
 import AddTag from '../../Pages/Tags/AddTag'
 import EditTag from '../../Pages/Tags/EditTag'
@@ -29,7 +29,14 @@ import AllBlogs from '../../Pages/Blogs/AllBlogs'
 import AddBlogs from '../../Pages/Blogs/AddBlogs'
 import EditBlogs from '../../Pages/Blogs/EditBlogs'
 import AllSubscription from '../../Pages/Subscripiton/AllSubscription'
-import AllCartEnquiry from '../../Pages/CartEnquiry/AllCartEnquiry'
+import AllBrandCategory from '../../Pages/BrandCategory/AllBrandCategory'
+import AddBrandCategory from '../../Pages/BrandCategory/AddBrandCategory'
+import EditBrandCategory from '../../Pages/BrandCategory/EditBrandCategory'
+import AllEnquiry from '../../Pages/Enquiry/AllEnquiry'
+import AllCardEnquiry from '../../Pages/CardEnquiry/CardEnquiry'
+import AllBannerImage from '../../Pages/Banner-Image/AllBannerImage'
+import AddBannerImage from '../../Pages/Banner-Image/AddBannerImage'
+import EditBannerImage from '../../Pages/Banner-Image/EditBannerImage'
 
 const Home = () => {
   const login = sessionStorage.getItem("login")
@@ -44,15 +51,29 @@ const Home = () => {
             <Routes>
               <Route path="/dashboard" element={<Dashboard />} />
 
+              {/* Working */}
+
               {/* Category Routes */}
               <Route path="/all-category" element={<AllCategory />} />
               <Route path="/add-category" element={<AddCategory />} />
               <Route path="/edit-category/:_id" element={<EditCategory />} />
 
+              {/* Shop Brand Routes */}
+              <Route path="/all-Brand" element={<AllBrand />} />
+              <Route path="/add-Brand" element={<AddBrand />} />
+              <Route path="/edit-Brand/:id" element={<EditBrand />} />
+
+              {/* Shop Brand-Category Routes */}
+              <Route path="/all-brand-category" element={<AllBrandCategory />} />
+              <Route path="/add-brand-category" element={<AddBrandCategory />} />
+              <Route path="/edit-brand-category/:id" element={<EditBrandCategory />} />
+
               {/* Product Routes */}
               <Route path="/all-products" element={<AllProduct />} />
               <Route path="/add-product" element={<AddProduct />} />
-              <Route path="/edit-product/:_id" element={<EditProduct />} />
+              <Route path="/edit-product/:id" element={<EditProduct />} />
+
+              {/* Working */}
 
               {/* User Routes */}
               <Route path="/all-users" element={<AllUsers />} />
@@ -65,17 +86,17 @@ const Home = () => {
               {/* Tag Routes */}
               <Route path="/all-tags" element={<AllTags />} />
               <Route path="/add-tag" element={<AddTag />} />
-              <Route path="/edit-tag/:_id" element={<EditTag />} />
+              <Route path="/edit-tag/:id" element={<EditTag />} />
 
               {/* Banner Routes */}
               <Route path="/all-banners" element={<AllBanner />} />
               <Route path="/add-banner" element={<AddBanner />} />
-              <Route path="/edit-banner/:_id" element={<EditBanner />} />
-
-              {/* Shop Banner Routes */}
-              <Route path="/all-shop-banners" element={<AllShopBanner />} />
-              <Route path="/add-shop-banner" element={<AddShopBanner />} />
-              <Route path="/edit-shop-banner/:_id" element={<EditShopBanner />} />
+              <Route path="/edit-banner/:id" element={<EditBanner />} />
+              
+              {/* all-banner-image */}
+              <Route path="/all-banner-image" element={<AllBannerImage />} />
+              <Route path="/add-banner-image" element={<AddBannerImage />} />
+              <Route path="/edit-banner-image/:id" element={<EditBannerImage />} />
 
               {/* Shop Banner Routes */}
               <Route path="/all-blog" element={<AllBlogs />} />
@@ -84,11 +105,13 @@ const Home = () => {
 
               {/* Order Routes */}
               <Route path="/all-orders" element={<AllOrder />} />
-              <Route path="/edit-order/:_id" element={<EditOrder />} />
+              <Route path="/edit-order/:id" element={<EditOrder />} />
 
               {/* All Subscription Email */}
               <Route path="/all-subscription-email" element={<AllSubscription />} />
-              <Route path="/all-cart-enquiry" element={<AllCartEnquiry />} />
+              <Route path="/all-enquiry" element={<AllEnquiry />} />
+              <Route path="/all-card-enquiry" element={<AllCardEnquiry />} />
+
             </Routes>
           </div>
         </>
