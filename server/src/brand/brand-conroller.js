@@ -62,9 +62,10 @@ exports.createBrand = catchAsyncErrors(async (req, res) => {
     try {
         const {
             brand_cat_id, name, seo_url, meta_title, meta_description,
-            meta_keyword, top_title, top_des, b_des, status,cat_id,
+            meta_keyword, top_title, top_des, b_des, status, cat_id,
         } = req.body;
 
+        console.log("cat_id:--", req.body)
         // Validation
         if (!name || !brand_cat_id) {
             return res.status(400).json({ status: false, message: 'Brand name and category are required' });
@@ -79,7 +80,7 @@ exports.createBrand = catchAsyncErrors(async (req, res) => {
 
         const sql = `
             INSERT INTO cyb_brands (
-                brand_cat_id,cat_id, name, image, banner, seo_url, meta_title,
+                brand_cat_id, name, image, banner,cat_id, seo_url, meta_title,
                 meta_description, meta_keyword, top_title, top_des, b_des, status
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
@@ -90,7 +91,7 @@ exports.createBrand = catchAsyncErrors(async (req, res) => {
             name,
             imagePath,
             bannerPath,
-            cat_id,
+            JSON.parse(cat_id),
             seo_url || null,
             meta_title || null,
             meta_description || null,

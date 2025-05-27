@@ -1,191 +1,131 @@
-// "use client"
-// import Image from 'next/image';
-// import React, { useEffect, useState } from 'react';
-// import { FaHeart, FaShoppingCart } from 'react-icons/fa';
-// import './shop.css';
-// import pic1 from '@/app/assets/products/item1.jpg';
-// import Link from 'next/link';
-// import HeroSection from '@/app/components/HeroSection/page';
-// import { getData, serverURL } from '@/app/services/FetchNodeServices';
-
-// const ProductCard = ({ image, name, details,   part_no, index }) => {
-//   return (
-//     <div className='ShopProduct-card'>
-//       <div className='ShopProductImg'>
-//         {/* <Image src={image} layout='responsive' width={300} height={250} alt='productimg' className='product-image' /> */}
-//         <Image className='product-image' layout='responsive' src={`${serverURL}/uploads/images/${image}` || image || `${serverURL}/${image}`} width={300} height={250} alt={name} />
-//       </div>
-//       <div className='Shopproduct-info'>
-//         <h3>{name}</h3>
-//         <p className='shopproduct-details'>{details}</p>
-//         <p className='shopproduct-part'><strong>Part Number:</strong> { part_no}</p>
-//         <div className='shopproduct-actions'>
-//           <Link href={`/pages/details-page/${index + 1}`}>
-//             <button className='btn btn-primary'>SHOP NOW</button>
-//           </Link>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// const ShopPage = () => {
-//   const [products, setProducts] = useState([]);
-//   const [searchTerm, setSearchTerm] = useState("");
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [totalPages, setTotalPages] = useState(1);
-//   const itemsPerPage = 10;
-  
-//   const getApiData = async () => {
-//     try {
-//       const res = await getData(
-//         `product/get-all-product?page=${currentPage}&limit=${itemsPerPage}&searchTerm=${searchTerm}`
-//       );
-//       console.log("Product Data:FRONTEND", res.data);
-//       if (res.status) {
-//         setProducts(res.data || []);
-//         setTotalPages(res.totalPages || 1);
-//       } else {
-//         toast.error("Failed to fetch product data");
-//       }
-//     } catch (error) {
-//       console.error("API Fetch Error:", error);
-//       toast.error("Something went wrong while fetching products");
-//     }
-//   };
-
-//   useEffect(() => {
-//     getApiData();
-//   }, [currentPage, searchTerm]);
-
-//   return (
-//     <>
-//       <HeroSection />
-//       <section className='shop-pageSec  bg-black'>
-//         <div className='container '>
-//           <div className='row '>
-//             <div className='col-lg-3 col-md-4'>
-//               <aside className='filters '>
-//                 <h2>Filters</h2>
-//                 <div className='filter-section'>
-//                   <h3>Origin</h3>
-//                   <label className='filter-option'>
-//                     <input type='checkbox' /> Aftermarket (100)
-//                   </label>
-//                   <label className='filter-option'>
-//                     <input type='checkbox' /> OEM (100)
-//                   </label>
-//                 </div>
-//                 <div className='filter-section'>
-//                   <h3>Class</h3>
-//                   <label className='filter-option'>
-//                     <input type='checkbox' /> Air / Electrical Horn (100)
-//                   </label>
-//                   <label className='filter-option'>
-//                     <input type='checkbox' /> Bellow (100)
-//                   </label>
-//                 </div>
-//               </aside>
-//             </div>
-//             <div className='col-lg-9 col-md-8'>
-//               <section className='ShopProduct-section pt-3'>
-//                 <div className='inputSec'>
-//                   <input className='search-input' onChange={(e) => setSearchTerm(e.target.value)} type="text" placeholder="Product Code / Name" />
-//                 </div>
-//                 <div className='shopproducts-grid'>
-//                   {products.map((product, index) => (
-//                     <ProductCard key={product.id} {...product} index={index} />
-//                   ))}
-//                 </div>
-//                 <div className="pagination mt-4 d-flex justify-content-center align-items-center gap-2 flex-wrap mb-5">
-//                      <button    className="btn btn-outline-light"    onClick={() => setCurrentPage(currentPage - 1)}    disabled={currentPage === 1}  >
-//                            Previous
-//                       </button>
-
-//   {Array.from({ length: totalPages }, (_, i) => i + 1)
-//     .filter((page) => {
-//       if (totalPages <= 5) return true;
-//       if (currentPage <= 3) return page <= 5;
-//       if (currentPage >= totalPages - 2) return page >= totalPages - 4;
-//       return Math.abs(currentPage - page) <= 2;
-//     })
-//     .map((page) => (
-//       <button
-//         key={page}
-//         className={`btn ${
-//           page === currentPage ? 'btn-light text-dark' : 'btn-outline-light'
-//         }`}
-//         onClick={() => setCurrentPage(page)}
-//       >
-//         {page}
-//       </button>
-//     ))}
-
-//   <button
-//     className="btn btn-outline-light"
-//     onClick={() => setCurrentPage(currentPage + 1)}
-//     disabled={currentPage === totalPages}
-//   >
-//     Next
-//   </button>
-// </div>
-//               </section>
-//             </div>
-//           </div>
-//         </div>
-//       </section>
-//     </>
-//   );
-// };
-
-// export default ShopPage;
-
 "use client";
 
 import Image from "next/image";
-import React, { useEffect, useState, useCallback } from "react";
-import { FaHeart, FaShoppingCart } from "react-icons/fa";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import Link from "next/link";
 import debounce from "lodash.debounce";
 import HeroSection from "@/app/components/HeroSection/page";
 import { getData, serverURL } from "@/app/services/FetchNodeServices";
-import "./shop.css";
 import { toast } from "react-toastify";
+import "./shop.css";
+import parse from 'html-react-parser';
 
-const ProductCard = ({ image, name, details, part_no, id }) => {
-  const imgSrc = image?.startsWith("http")
-    ? image
-    : `${serverURL}/uploads/images/${image}`;
+// Reusable FilterSection Component
+const FilterSection = ({ title, items, selectedIds, onToggle, defaultOpen = false }) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  const toggleDrawer = () => setIsOpen((prev) => !prev);
 
   return (
-    <div className="ShopProduct-card">
+    <div
+      className="filter-section mb-4"
+
+    >
+      <div
+        className="filter-header d-flex justify-content-between align-items-center text-white"
+        onClick={toggleDrawer}
+        style={{ cursor: "pointer" }}
+        aria-expanded={isOpen}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === "Enter" && toggleDrawer()}
+      >
+        <h5 className="mb-0">{title}</h5>
+        {isOpen ? <FaChevronUp /> : <FaChevronDown />}
+      </div>
+
+      {isOpen && (
+        <div style={{
+          maxHeight: 300,
+          overflowY: "auto",
+          overflowX: "hidden",
+          scrollBehavior: "smooth",
+          scrollbarWidth: "thin",
+        }}
+          className="filter-options mt-2 ps-2">
+          {items?.map(({ id, name }) => (
+            <label
+              key={id}
+              className="d-flex align-items-center mb-2 text-white"
+              htmlFor={`${title}-${id}`}
+            >
+              <input
+                id={`${title}-${id}`}
+                type="checkbox"
+                checked={selectedIds.includes(id)}
+                onChange={() => onToggle(id)}
+                className="me-2"
+              />
+              {name}
+            </label>
+          ))}
+        </div>
+      )}
+      <hr className="border-secondary mt-3 mb-2" />
+    </div>
+  );
+};
+
+// Product Card Component
+const ProductCard = ({ image, name, product_description, part_no, id }) => {
+  const imgSrc = useMemo(
+    () => (image?.startsWith("http") ? image : `${serverURL}/uploads/images/${image}`),
+    [image]
+  );
+
+  const HtmlRenderer = (product_description) => {
+    const html = product_description;
+    // alert(html)
+    if (typeof html === 'string') {
+      return <>{parse(html)}</>;
+    }
+    return null;
+  };
+
+
+  return (
+    <article className="ShopProduct-card" aria-label={name}>
       <div className="ShopProductImg">
         <Image
           src={imgSrc}
           layout="responsive"
           width={300}
           height={250}
-          alt={name}
+          alt={name || "Product image"}
           className="product-image"
+          priority={false}
         />
       </div>
       <div className="Shopproduct-info">
         <h3>{name}</h3>
-        <p className="shopproduct-details">{details}</p>
+        <p className="shopproduct-details">{HtmlRenderer(product_description)}</p>
         <p className="shopproduct-part">
           <strong>Part Number:</strong> {part_no}
         </p>
         <div className="shopproduct-actions">
-          <Link href={`/pages/details-page/${id}`}>
+          <Link href={`/pages/details-page/${id}`} passHref>
             <button className="btn btn-primary">SHOP NOW</button>
           </Link>
         </div>
       </div>
-    </div>
+    </article>
   );
 };
 
+// Main ShopPage Component
 const ShopPage = () => {
+  // Filter data states
+  const [brandCategory, setBrandCategory] = useState([]);
+  const [allBrand, setAllBrand] = useState([]);
+  const [category, setCategory] = useState([]);
+
+  // Selected filters
+  const [selectedBrandCategory, setSelectedBrandCategory] = useState([]);
+  const [selectedBrands, setSelectedBrands] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+
+  // Products & pagination states
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -193,37 +133,84 @@ const ShopPage = () => {
   const [loading, setLoading] = useState(false);
   const itemsPerPage = 10;
 
-  const fetchProducts = async (search = searchTerm, page = currentPage) => {
+  // Fetch helper
+  const fetchData = async (url, setter, errorMsg) => {
     try {
-      setLoading(true);
-      const res = await getData(
-        `product/get-all-product?page=${page}&limit=${itemsPerPage}&search=${search}`
-      );
-      if (res.status) {
-        setProducts(res.data || []);
-        setTotalPages(res.totalPages || 1);
-      } else {
-        toast.error("Failed to fetch product data");
-      }
+      const res = await getData(url);
+      if (res.status) setter(res.data);
+      else toast.error(errorMsg);
     } catch (error) {
-      console.error("API Fetch Error:", error);
-      toast.error("Something went wrong while fetching products");
-    } finally {
-      setLoading(false);
+      console.error(error);
+      toast.error(errorMsg);
     }
   };
 
+  // Fetch all filters on mount
+  useEffect(() => {
+    fetchData("brandCategory/get-all-brand-category", setBrandCategory, "Failed to load brand categories");
+    fetchData("brand/get-all-brand", setAllBrand, "Failed to load brands");
+    fetchData("category/get-all-categorys", setCategory, "Failed to load categories");
+  }, []);
+
+  // Build filter query string
+  const buildFilterQuery = (filters) => {
+    const queryParts = [];
+    if (filters.brandCategory.length) queryParts.push(`brandCategory=${filters.brandCategory.join(",")}`);
+    if (filters.brand.length) queryParts.push(`brand=${filters.brand.join(",")}`);
+    if (filters.category.length) queryParts.push(`category=${filters.category.join(",")}`);
+    return queryParts.length ? `&${queryParts.join("&")}` : "";
+  };
+
+  // Fetch products with filters, search and pagination
+  const fetchProducts = useCallback(
+    async (search = searchTerm, page = currentPage, filters = {
+      brandCategory: selectedBrandCategory,
+      brand: selectedBrands,
+      category: selectedCategories,
+    }) => {
+      setLoading(true);
+      try {
+        const filterQuery = buildFilterQuery(filters);
+        const res = await getData(
+          filterQuery
+            ? `product/search-product?page=${page}&limit=${itemsPerPage}&search=${encodeURIComponent(search)}${filterQuery}`
+            : `product/get-all-product?page=${page}&limit=${itemsPerPage}&search=${search}`
+        );
+        if (res.status) {
+          setProducts(res.data || []);
+          setTotalPages(res.totalPages || 1);
+        } else {
+          toast.error("Failed to fetch product data");
+        }
+      } catch (error) {
+        console.error("Fetch Error:", error);
+        toast.error("Error fetching products");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [searchTerm, currentPage,
+      selectedBrandCategory,
+      selectedBrands, selectedCategories]
+  );
+
+  // Fetch products when filters, page or search change
   useEffect(() => {
     fetchProducts();
-  }, [currentPage]);
+  }, [fetchProducts]);
 
-  const debouncedSearch = useCallback(
+  // Debounced search
+  const debouncedSearch = useMemo(() =>
     debounce((query) => {
       setCurrentPage(1);
-      fetchProducts(query, 1);
-    }, 500),
-    []
-  );
+      fetchProducts(query, 1, {
+        brandCategory: selectedBrandCategory,
+        brand: selectedBrands,
+        category: selectedCategories,
+      });
+    }, 500), [
+    selectedBrandCategory,
+    selectedBrands, selectedCategories, fetchProducts]);
 
   const handleSearchChange = (e) => {
     const val = e.target.value;
@@ -231,106 +218,134 @@ const ShopPage = () => {
     debouncedSearch(val);
   };
 
+  // Toggle handler for filters
+  const handleToggle = (filterType, id) => {
+    const updateSelected = (selected, setSelected) =>
+      selected.includes(id) ? selected.filter((item) => item !== id) : [...selected, id];
+
+    switch (filterType) {
+      case "brandCategory":
+        setSelectedBrandCategory((prev) => updateSelected(prev, setSelectedBrandCategory));
+        break;
+      case "brand":
+        setSelectedBrands((prev) => updateSelected(prev, setSelectedBrands));
+        break;
+      case "category":
+        setSelectedCategories((prev) => updateSelected(prev, setSelectedCategories));
+        break;
+      default:
+        break;
+    }
+    setCurrentPage(1);
+  };
+
+  // Pagination logic: smart page numbers with ellipsis
+  const paginationButtons = useMemo(() => {
+    if (totalPages <= 5) return Array.from({ length: totalPages }, (_, i) => i + 1);
+
+    const pages = [];
+
+    if (currentPage <= 3) {
+      for (let i = 1; i <= 5; i++) pages.push(i);
+    } else if (currentPage >= totalPages - 2) {
+      for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+    } else {
+      for (let i = currentPage - 2; i <= currentPage + 2; i++) pages.push(i);
+    }
+
+    return pages;
+  }, [totalPages, currentPage]);
+
   return (
     <>
       <HeroSection />
-      <section className="shop-pageSec bg-black">
-        <div className="container">
+      <section className="shop-pageSec bg-black text-white" >
+        <div className="container" >
           <div className="row">
             {/* Sidebar Filters */}
-            <div className="col-lg-3 col-md-4">
-              <aside className="filters">
-                <h2>Filters</h2>
-                <div className="filter-section">
-                  <h3>Origin</h3>
-                  <label className="filter-option">
-                    <input type="checkbox" /> Aftermarket (100)
-                  </label>
-                  <label className="filter-option">
-                    <input type="checkbox" /> OEM (100)
-                  </label>
-                </div>
-                <div className="filter-section">
-                  <h3>Class</h3>
-                  <label className="filter-option">
-                    <input type="checkbox" /> Air / Electrical Horn (100)
-                  </label>
-                  <label className="filter-option">
-                    <input type="checkbox" /> Bellow (100)
-                  </label>
-                </div>
-              </aside>
-            </div>
+            <aside className="col-lg-3 col-md-4 filters p-3 bg-dark rounded" style={{ marginTop: 40, height: "auto" }}>
+              <FilterSection
+                title="Brand Category"
+                items={brandCategory}
+                selectedIds={selectedBrandCategory}
+                onToggle={(id) => handleToggle("brandCategory", id)}
+                defaultOpen={false}  // <-- Add this
+              />
+              <FilterSection
+                title="Brand"
+                items={allBrand}
+                selectedIds={selectedBrands}
+                onToggle={(id) => handleToggle("brand", id)}
+                defaultOpen={false}
+              />
+              <FilterSection
+                title="Category"
+                items={category}
+                selectedIds={selectedCategories}
+                onToggle={(id) => handleToggle("category", id)}
+                defaultOpen={false}
+              />
+            </aside>
 
             {/* Products Section */}
-            <div className="col-lg-9 col-md-8">
-              <section className="ShopProduct-section pt-3">
-                <div className="inputSec">
-                  <input
-                    className="search-input"
-                    value={searchTerm}
-                    onChange={handleSearchChange}
-                    type="text"
-                    placeholder="Search Product Name / SKU"
-                  />
+            <section className="col-lg-9 col-md-8 ShopProduct-section pt-3">
+              <div className="inputSec mb-4">
+                <input
+                  className="search-input form-control"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  type="text"
+                  placeholder="Search Product Name / Part_on"
+                  aria-label="Search products by name or Part_on"
+                />
+              </div>
+
+              {loading ? (
+                <p className="text-white mt-4">Loading products...</p>
+              ) : products.length > 0 ? (
+                <div className="shopproducts-grid row">
+                  {products.map((product) => (
+                    <div className="col-md-6 col-lg-4 mb-4" key={product.id}>
+                      <ProductCard {...product} />
+                    </div>
+                  ))}
                 </div>
+              ) : (
+                <p className="text-white mt-4">No products found.</p>
+              )}
 
-                {loading ? (
-                  <p className="text-white mt-4">Loading products...</p>
-                ) : (
-                  <div className="shopproducts-grid">
-                    {products.length > 0 ? (
-                      products.map((product) => (
-                        <ProductCard key={product.id} {...product} />
-                      ))
-                    ) : (
-                      <p className="text-white mt-4">No products found.</p>
-                    )}
-                  </div>
-                )}
+              {/* Pagination */}
+              <div className="pagination mt-4 d-flex justify-content-center align-items-center gap-2 flex-wrap mb-5">
+                <button
+                  className="btn btn-outline-light"
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  aria-label="Previous page"
+                >
+                  Previous
+                </button>
 
-                {/* Pagination */}
-                <div className="pagination mt-4 d-flex justify-content-center align-items-center gap-2 flex-wrap mb-5">
+                {paginationButtons.map((page) => (
                   <button
-                    className="btn btn-outline-light"
-                    onClick={() => setCurrentPage((prev) => prev - 1)}
-                    disabled={currentPage === 1}
+                    key={page}
+                    className={`btn ${page === currentPage ? "btn-light text-dark" : "btn-outline-light"}`}
+                    onClick={() => setCurrentPage(page)}
+                    aria-current={page === currentPage ? "page" : undefined}
                   >
-                    Previous
+                    {page}
                   </button>
+                ))}
 
-                  {Array.from({ length: totalPages }, (_, i) => i + 1)
-                    .filter((page) => {
-                      if (totalPages <= 5) return true;
-                      if (currentPage <= 3) return page <= 5;
-                      if (currentPage >= totalPages - 2)
-                        return page >= totalPages - 4;
-                      return Math.abs(currentPage - page) <= 2;
-                    })
-                    .map((page) => (
-                      <button
-                        key={page}
-                        className={`btn ${
-                          page === currentPage
-                            ? "btn-light text-dark"
-                            : "btn-outline-light"
-                        }`}
-                        onClick={() => setCurrentPage(page)}
-                      >
-                        {page}
-                      </button>
-                    ))}
-
-                  <button
-                    className="btn btn-outline-light"
-                    onClick={() => setCurrentPage((prev) => prev + 1)}
-                    disabled={currentPage === totalPages}
-                  >
-                    Next
-                  </button>
-                </div>
-              </section>
-            </div>
+                <button
+                  className="btn btn-outline-light"
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  aria-label="Next page"
+                >
+                  Next
+                </button>
+              </div>
+            </section>
           </div>
         </div>
       </section>
@@ -339,238 +354,3 @@ const ShopPage = () => {
 };
 
 export default ShopPage;
-
-
-
-
-// import Image from 'next/image';
-// import React from 'react';
-// import { FaHeart, FaShoppingCart } from 'react-icons/fa';
-// import './shop.css';
-// import pic1 from '@/app/assets/products/item1.jpg'
-// import Link from 'next/link';
-// import HeroSection from '@/app/components/HeroSection/page';
-
-// const products = [
-//   { id: 1, image: pic1, name: 'RADIATOR ASSY: 253100X060', details: 'Mobis (Hyundai, Kia) 253100X060', part: '253100X060' },
-//   { id: 2, image: pic1, name: 'STRUT ASSY-FR,RH: 546600X100', details: 'Mobis (Hyundai, Kia) 546600X100', part: '546600X100' },
-//   { id: 3, image: pic1, name: 'BLOWER ASSY: 25380B4200', details: 'Mobis (Hyundai, Kia) 25380B4200', part: '25380B4200' },
-//   { id: 4, image: pic1, name: 'BLOWER ASSY: 25380B4200', details: 'Mobis (Hyundai, Kia) 25380B4200', part: '25380B4200' },
-//   { id: 5, image: pic1, name: 'BLOWER ASSY: 25380B4200', details: 'Mobis (Hyundai, Kia) 25380B4200', part: '25380B4200' },
-//   { id: 6, image: pic1, name: 'BLOWER ASSY: 25380B4200', details: 'Mobis (Hyundai, Kia) 25380B4200', part: '25380B4200' },
-//   { id: 7, image: pic1, name: 'BLOWER ASSY: 25380B4200', details: 'Mobis (Hyundai, Kia) 25380B4200', part: '25380B4200' },
-//   { id: 8, image: pic1, name: 'BLOWER ASSY: 25380B4200', details: 'Mobis (Hyundai, Kia) 25380B4200', part: '25380B4200' },
-// ];
-
-// const ProductCard = ({ image, name, details, part,index }) => {
-//   return (
-// <>    
-//     <div className='product-card bg-dark'>
-//       <Image src={image} width={250} height={250} alt='productimg' className='product-image' />
-//       <div className='product-info'>
-//         <h3>{name}</h3>
-//         <p className='text-light'>{details}</p>
-//         <p className='text-primary'><strong>Part Number:</strong> {part}</p>
-//         <div className='product-actions '>
-//        <Link href={`/pages/details-page/${index+1}`}> <button className='btn btn-light w-100 m-1 '>SHOP NOW</button> </Link>
-//           {/* <FaHeart className=' wishlist-icon ' /> */}
-//         </div>
-//       </div>
-//     </div>
-//     </>
-
-//   );
-// };
-
-// const ShopPage = () => {
-//   return (
-//    <>
-//    <HeroSection/>
-
-//      <section className='bg-black'>
-//      <div className='container'>
-//       <div className='shop-container  d-flex'>
-//         <aside className='filters bg-dark'>
-//             <h2>Filters</h2>
-//             <div>
-//           <h3>Origin</h3>
-//           <label><input type='checkbox' /> Aftermarket (100)</label>
-//           <label><input type='checkbox' /> OEM (100)</label>
-//             </div>
-//             <div>
-//           <h3>Class</h3>
-//           <label><input type='checkbox' /> Air / Electrical Horn (100)</label>
-//           <label><input type='checkbox' /> Bellow (100)</label>
-//         </div>
-//         <div>
-//           {/* <h3>Price</h3>
-//           <input type='range' min='0' max='9000' step='50' /> */}
-//         </div>
-//       </aside>
-
-//       <section className='ProductSec'>
-//             <div className='inputSec'>
-//               <input  className='form-control w-25' type="text" placeholder="Product Code / Name " />
-//             </div>
-//             <div className='d-flex product-section'>
-//         {products.map((product,index) => (
-//           <ProductCard key={product.id} {...product} index={index} />
-//         ))}
-//         </div>
-//       </section>
-//     </div>
-//       </div>
-
-//      </section>
-   
-//    </>
-//   );
-// };
-
-// export default ShopPage;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// "use client";
-
-// import Image from 'next/image';
-// import React, { useEffect, useState } from 'react';
-// import { FaHeart } from 'react-icons/fa';
-// import './shop.css';
-// import pic1 from '@/app/assets/products/item1.jpg';
-// import Link from 'next/link';
-// import HeroSection from '@/app/components/HeroSection/page'; // fixed import
-
-// // Static product list (you can remove this if using API products only)
- 
-// const ProductCard = ({ image, title, price, category, index }) => {
-//   return (
-//     <div className='product-card bg-dark'>
-//       <Image src={image} width={250} height={250} alt='productimg' className='product-image' />
-//       <div className='product-info'>
-//         <h3 className='line-clamp-2'>{title}</h3>
-//         <p>{category}</p>
-//         <p><strong>Part Number:</strong> {price}</p>
-//         <div className='product-actions'>
-//           <Link href={`/pages/details-page/${index + 1}`} className='btn btn-light w-100 m-1'>SHOP NOW</Link>
-//           <FaHeart className='wishlist-icon' />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// const ShopPage = () => {
-//   const [apiProducts, setApiProducts] = useState([]);
-
-
-//   const fetchData = async () => {
-//     try {
-//       const response = await fetch('https://fakestoreapi.com/products');
-//       if (!response.ok) throw new Error('Network response was not ok');
-//       const data = await response.json();
-//       console.log('Fetched data:', data);
-//       setApiProducts(data);
-//     } catch (error) {
-//       console.error('Error fetching data:', error);
-//     }
-//   };
-
-
-//   useEffect(() => {
-//     fetchData();
-//   }, []);
-
-//   return (
-//     <>
-//       <HeroSection />
-
-//       <section className='bg-black'>
-//         <div className='container'>
-//           <div className='shop-container d-flex'>
-// <div className='row'>
-// <div className='col-md-3'>
-// <aside className='filters bg-dark'>
-//               <h2>Filters</h2>
-//               <div>
-//                 <h3>Origin</h3>
-//                 <label><input type='checkbox' /> Aftermarket (100)</label>
-//                 <label><input type='checkbox' /> OEM (100)</label>
-//               </div>
-//               <div>
-//                 <h3>Class</h3>
-//                 <label><input type='checkbox' /> Air / Electrical Horn (100)</label>
-//                 <label><input type='checkbox' /> Bellow (100)</label>
-//               </div>
-//               {/* Uncomment and style if you want price filter */}
-//               {/* <div>
-//                 <h3>Price</h3>
-//                 <input type='range' min='0' max='9000' step='50' />
-//               </div> */}
-//             </aside>
-
-//                 </div>
-//                <div className='col-md-9'>
-//                <div className='row'>
-
-//                   <div className='col-md-4'>
-//                <form action="">
-    
-//                   <label htmlFor="validation01" className="form-label">Search by Product Name or Code </label>
-//                   <input type="text" className="form-control is-valid mb-3" id="validation01" value="Mark"   onChange={(e) => setSearchValue(e.target.value)} placeholder='Product Name / Code' />
- 
-//            </form>
-
-//                 </div>
-
-
-
-//                     </div>
-
-//                        <section className='product-section d-flex flex-wrap'>
-                          
-//                           {apiProducts.map((product, index) => (
-//                             <ProductCard key={product.id} {...product} index={index} />
-//                           ))}
-//                         </section>
-//                  </div>
-
-//               </div>
-  
-//           </div>
-//         </div>
-//       </section>
-//     </>
-//   );
-// };
-
-// export default ShopPage;
-
-
-
-
-
-
-
-
-
-
-

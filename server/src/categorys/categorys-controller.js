@@ -1,7 +1,6 @@
 const pool = require("../../db/pool");
 const catchAsyncErrors = require("../../middleware/catchAsyncErrors");
 const { deleteLocalFile } = require("../../middleware/DeleteImageFromLoaclFolder");
-const { uploadImage, deleteImage } = require("../../middleware/Uploads");
 const ErrorHandler = require("../../utils/ErrorHandler");
 const fs = require('fs');
 const path = require("path");

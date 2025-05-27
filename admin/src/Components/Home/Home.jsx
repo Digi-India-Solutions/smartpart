@@ -33,10 +33,10 @@ import AllBrandCategory from '../../Pages/BrandCategory/AllBrandCategory'
 import AddBrandCategory from '../../Pages/BrandCategory/AddBrandCategory'
 import EditBrandCategory from '../../Pages/BrandCategory/EditBrandCategory'
 import AllEnquiry from '../../Pages/Enquiry/AllEnquiry'
-import AllCardEnquiry from '../../Pages/CardEnquiry/CardEnquiry'
 import AllBannerImage from '../../Pages/Banner-Image/AllBannerImage'
 import AddBannerImage from '../../Pages/Banner-Image/AddBannerImage'
 import EditBannerImage from '../../Pages/Banner-Image/EditBannerImage'
+import AllProductEnquiry from '../../Pages/ProductEnquiry/Productnquiry'
 
 const Home = () => {
   const login = sessionStorage.getItem("login")
@@ -92,7 +92,7 @@ const Home = () => {
               <Route path="/all-banners" element={<AllBanner />} />
               <Route path="/add-banner" element={<AddBanner />} />
               <Route path="/edit-banner/:id" element={<EditBanner />} />
-              
+
               {/* all-banner-image */}
               <Route path="/all-banner-image" element={<AllBannerImage />} />
               <Route path="/add-banner-image" element={<AddBannerImage />} />
@@ -110,7 +110,7 @@ const Home = () => {
               {/* All Subscription Email */}
               <Route path="/all-subscription-email" element={<AllSubscription />} />
               <Route path="/all-enquiry" element={<AllEnquiry />} />
-              <Route path="/all-card-enquiry" element={<AllCardEnquiry />} />
+              <Route path="/all-card-enquiry" element={<AllProductEnquiry />} />
 
             </Routes>
           </div>

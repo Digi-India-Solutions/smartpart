@@ -3,7 +3,7 @@ const router = Router();
 const multer = require('multer');
 const fs = require("fs");
 const path = require('path');
-const { createProduct, getAllProduct, getAllProductById, updateProduct, deleteProduct } = require("./product-controller")
+const { createProduct, getAllProduct, getAllProductById, updateProduct, deleteProduct , searchProduct } = require("./product-controller")
 
 const uploadDir = path.join(__dirname, '../../uploads/images');
 
@@ -34,6 +34,8 @@ router.get("/get-all-product-by-id/:id", getAllProductById)
 router.post("/update-product/:id", upload.single("image"), updateProduct)
 
 router.get('/delete-product/:id', deleteProduct);
+
+router.get('/search-product',searchProduct)
 
 
 module.exports = router;

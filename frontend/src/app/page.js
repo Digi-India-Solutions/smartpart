@@ -24,24 +24,7 @@ import { getData } from './services/FetchNodeServices'
 // import { FaWhatsapp, FaPhone } from "react-icons/fa";
 
 const page = () => {
-  ////////Brand///////
-  // const [brand, setBrand] = useState([])
 
-  // const fetchBrand = async () => {
-  //   try {
-  //     const res = await getData("brand/get-all-brand");
-  //     console.log("Brand Data:", res?.data);
-  //     setBrand(res?.data);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
-  // useEffect((
-  //   fetchBrand()
-  // ), [])
-
-  // console.log("FRONEND_DATA:-", brand)
-  ///////////////////////////////////////////////////////////////////
   return (
     <>
       <Carousel />   

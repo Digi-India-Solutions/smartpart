@@ -22,8 +22,10 @@ const AllBlogs = () => {
     setError(null);
     try {
       const res = await getData('blog/get-all-blog');
+      console.log("GGGGGG:-", res)
       if (res.status) {
-        setBlogs(res.data);
+        setBlogs(res.data.blogs
+        );
       } else {
         setError('Failed to fetch blogs');
       }
@@ -45,7 +47,7 @@ const AllBlogs = () => {
       const res = await getData(`blog/delete-blog/${id}`);
       if (res.status) {
         toast.success('Blog deleted successfully');
-        setBlogs(prev => prev.filter(blog => blog.id !== id));
+        setBlogs(prev => prev?.filter(blog => blog?.id !== id));
       } else {
         toast.error('Failed to delete blog');
       }
@@ -55,13 +57,13 @@ const AllBlogs = () => {
   };
 
   // Filter blogs by search term (title or descri)
-  const filteredBlogs = blogs.filter(blog =>
-    blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (blog.descri && blog.descri.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredBlogs = blogs?.filter(blog =>
+    blog?.title?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+    (blog?.descri && blog?.descri?.toLowerCase().includes(searchTerm?.toLowerCase()))
   );
 
   // Pagination logic
-  const totalPages = Math.ceil(filteredBlogs.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredBlogs?.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredBlogs.slice(indexOfFirstItem, indexOfLastItem);

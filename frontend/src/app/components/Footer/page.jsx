@@ -9,8 +9,34 @@ import { FaSquareXTwitter } from "react-icons/fa6";
 import { FaInstagram } from "react-icons/fa";
 import { IoLogoWechat } from "react-icons/io5";
 import { FaPinterest } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { getData } from "@/app/services/FetchNodeServices";
 
 export default function Footer() {
+const [categorys , setCategorys]=useState([])
+const [brand , setBrand]=useState([])
+
+  const fetchCategory=async()=>{
+       const response = await getData('category/get-all-categorys');
+      //  console.log("XXXXXXXXXXXXX:::::--",response)
+       if(response?.status){
+        setCategorys(response?.data)
+       }
+  }
+  const fetchBrand= async()=>{
+    const res = await getData("brand/get-all-brand");
+    // console.log("XXXXXXXXXXXXX:::::--",response)
+    if(res?.status){
+     setBrand(res?.data)
+    }
+  }
+  useEffect(()=>{
+    fetchCategory()
+    fetchBrand()
+  },[])
+// console.log("XXXXXXXXXXXXX:::::--",brand)
+const filterOEMBrand = brand?.filter((b)=>b?.brand_category_name==='Top OEM Brands')
+const filterAftermarkets = brand?.filter((b)=>b?.brand_category_name==='TOP AFTERMARKETS BRANDS')
   return (
     <footer className="footer">
       <div className="container-fluid">
@@ -47,20 +73,23 @@ export default function Footer() {
           <div className="col-md-2 col-6">
             <h5>Categories</h5>
             <ul className="list-unstyled small">
-            <li> <Link href='/pages/all-products' className="text-light text-decoration-none ">Maintenance Service Part</Link></li>
-            <li> <Link href='/pages/all-products' className="text-light text-decoration-none ">Air Conditioning</Link></li>
-            <li> <Link href='/pages/all-products' className="text-light text-decoration-none ">Belts Chains and Rollers</Link></li>
-            <li> <Link href='/pages/all-products' className="text-light text-decoration-none ">Body</Link></li>
-            <li> <Link href='/pages/all-products' className="text-light text-decoration-none ">View All</Link></li>
-            </ul>
+  {categorys.slice(0, 5).map((cat, index) => (
+    <li key={cat._id || index}>
+      <Link href={{ pathname: `/pages/all-products`}}className="text-light text-decoration-none">
+      {cat?.name}
+      </Link>
+      </li>
+  ))}
+  
+  <li><Link href="/pages/all-products" className="text-light text-decoration-none" > View All </Link> </li>
+</ul>
           </div>
           <div className="col-md-2 col-6">
-            <h5>OEM Brands</h5>
+            <h5>OEM Brands</h5>  
             <ul className="list-unstyled small">
-            <li> <Link href='/pages/all-products' className="text-light text-decoration-none ">Suzuki</Link></li>
-            <li> <Link href='/pages/all-products' className="text-light text-decoration-none ">Hyundai</Link></li>
-            <li> <Link href='/pages/all-products' className="text-light text-decoration-none ">Mahindra</Link></li>
-            <li> <Link href='/pages/all-products' className="text-light text-decoration-none ">Tata</Link></li>
+            {filterOEMBrand?.slice(0, 5).map((brand, index) => (
+              <li> <Link href='/pages/all-products' className="text-light text-decoration-none ">{brand?.name}</Link></li>
+            ))}
             <li> <Link href='/pages/all-products' className="text-light text-decoration-none ">View All</Link></li>
             </ul>
           </div>
@@ -68,10 +97,9 @@ export default function Footer() {
           <div className="col-md-2 col-6">
             <h5>Aftermarkets Brands</h5>
             <ul className="list-unstyled small">
-            <li> <Link href='/pages/all-products' className="text-light text-decoration-none">Bosch</Link></li>
-            <li> <Link href='/pages/all-products' className="text-light text-decoration-none">Schaeffler</Link></li>
-            <li> <Link href='/pages/all-products' className="text-light text-decoration-none">Mando</Link></li>
-            <li> <Link href='/pages/all-products' className="text-light text-decoration-none">Valeo</Link></li>
+            {filterAftermarkets?.slice(0, 5).map((brand, index) => (
+              <li> <Link href='/pages/all-products' className="text-light text-decoration-none ">{brand?.name}</Link></li>
+            ))}
             <li> <Link href='/pages/all-products' className="text-light text-decoration-none">View All</Link></li>
             </ul>
           </div>

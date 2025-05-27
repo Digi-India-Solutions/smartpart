@@ -9,6 +9,64 @@ import { getData, serverURL } from '@/app/services/FetchNodeServices';
 import debounce from "lodash.debounce";
 import { toast } from "react-toastify";
 import parse from 'html-react-parser';
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { useRouter, useSearchParams } from 'next/navigation';
+
+
+const FilterSection = ({ title, items, selectedIds, onToggle, defaultOpen = false }) => {
+    const [isOpen, setIsOpen] = useState(defaultOpen);
+
+    const toggleDrawer = () => setIsOpen((prev) => !prev);
+
+    return (
+        <div
+            className="filter-section mb-4"
+        >
+            <div
+                className="filter-header d-flex justify-content-between align-items-center text-white"
+                onClick={toggleDrawer}
+                style={{ cursor: "pointer" }}
+                aria-expanded={isOpen}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === "Enter" && toggleDrawer()}
+            >
+                <h5 className="mb-0">{title}</h5>
+                {isOpen ? <FaChevronUp /> : <FaChevronDown />}
+            </div>
+
+            {isOpen && (
+                <div style={{
+                    maxHeight: 300,
+                    overflowY: "auto",
+                    overflowX: "hidden",
+                    scrollBehavior: "smooth",
+                    scrollbarWidth: "thin",
+                }}
+                    className="filter-options mt-2 ps-2">
+                    {items?.map(({ id, name }) => (
+                        <label
+                            key={id}
+                            className="d-flex align-items-center mb-2 text-white"
+                            htmlFor={`${title}-${id}`}
+                        >
+                            <input
+                                id={`${title}-${id}`}
+                                type="checkbox"
+                                checked={selectedIds.includes(id)}
+                                onChange={() => onToggle(id)}
+                                className="me-2"
+                            />
+                            {name}
+                        </label>
+                    ))}
+                </div>
+            )}
+            <hr className="border-secondary mt-3 mb-2" />
+        </div>
+    );
+};
+
 
 const ProductCard = ({ image, name, product_description, part_no, id }) => {
     const imgSrc = image?.startsWith("http") ? image : `${serverURL}/uploads/images/${image}`;
@@ -30,7 +88,7 @@ const ProductCard = ({ image, name, product_description, part_no, id }) => {
             </div>
             <div className='Allproduct-info'>
                 <h3>{name}</h3>
-                <p className='Allproduct-details'>{safeHtmlParse(product_description)}</p>
+                <div className='Allproduct-details'>{safeHtmlParse(product_description)}</div>
                 <p className='Allproduct-part'><strong>Part Number:</strong> {part_no}</p>
                 <div className='Allproduct-actions'>
                     <Link href={`/pages/details-page/${id}`}>
@@ -43,78 +101,114 @@ const ProductCard = ({ image, name, product_description, part_no, id }) => {
 };
 
 const Page = ({ id }) => {
-    const [brand, setBrand] = useState(null);
+    const searchParams = useSearchParams();
     const [brandCategory, setBrandCategory] = useState([]);
     const [allBrand, setAllBrand] = useState([]);
     const [category, setCategory] = useState([]);
+    const [brand, setBrand] = useState(id || '')
+
+    // Selected filters
+    const [selectedBrandCategory, setSelectedBrandCategory] = useState([]);
+    const [selectedBrands, setSelectedBrands] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]);
+
+    // Products & pagination states
     const [products, setProducts] = useState([]);
-    const [searchTerm, setSearchTerm] = useState(id || "");
+    const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
     const itemsPerPage = 10;
 
-    const fetchBrand = async () => {
-        const res = await getData(`brand/get-all-brand-by-id/${id}`);
-        if (res.status) setBrand(res?.data);
-    };
 
+    useEffect(() => {
+        const query = searchParams.get('query');
+        if (query) {
+          const decodedQuery = decodeURIComponent(query);
+          setSearchTerm(decodedQuery);
+          console.log('Search Term:', decodedQuery);
+        }
+      }, [searchParams]);
 
-    const fetchBrandCategories = async () => {
-        const res = await getData(`brandCategory/get-all-brand-category`);
-        if (res.status) setBrandCategory(res?.data);
-    };
-
-    const fetchAllBrand = async () => {
-        const res = await getData("brand/get-all-brand");
-        if (res.status) setAllBrand(res?.data);
-    };
-
-    const fetchCategories = async () => {
-        const res = await getData('category/get-all-categorys');
-        if (res.status) setCategory(res?.data);
-    };
-
-    const fetchProducts = async (search = searchTerm, page = currentPage) => {
+    // Fetch helper
+    const fetchData = async (url, setter, errorMsg) => {
         try {
-            setLoading(true);
-            const res = await getData(
-                `product/get-all-product?page=${page}&limit=${itemsPerPage}&search=${search}`
-            );
-            if (res.status) {
-                setProducts(res.data || []);
-                setTotalPages(res.totalPages || 1);
-            } else {
-                toast.error("Failed to fetch product data");
-            }
+            const res = await getData(url);
+            if (res?.status) setter(res?.data);
+            else toast.error(errorMsg);
         } catch (error) {
-            console.error("API Fetch Error:", error);
-            toast.error("Error fetching products");
-        } finally {
-            setLoading(false);
+            console.error(error);
+            toast.error(errorMsg);
         }
     };
 
-    console.log("XXXXXXXXXXXXXXXX:--", products)
+    // Fetch all filters on mount
     useEffect(() => {
-        if (id) fetchBrand();
-        fetchBrandCategories();
-        fetchAllBrand();
-        fetchCategories();
-    }, [id]);
+        fetchData("brandCategory/get-all-brand-category", setBrandCategory, "Failed to load brand categories");
+        fetchData("brand/get-all-brand", setAllBrand, "Failed to load brands");
+        fetchData("category/get-all-categorys", setCategory, "Failed to load categories");
+        fetchData(`brand/get-all-brand-by-id/${id}`, setBrand, "Failed to load brand")
+    }, []);
 
+    // Build filter query string
+    const buildFilterQuery = (filters) => {
+        const queryParts = [];
+        if (filters.brandCategory.length) queryParts.push(`brandCategory=${filters.brandCategory.join(",")}`);
+        if (filters.brand.length) queryParts.push(`brand=${filters.brand.join(",")}`);
+        if (filters.category.length) queryParts.push(`category=${filters.category.join(",")}`);
+        return queryParts.length ? `&${queryParts.join("&")}` : "";
+    };
+
+    // Fetch products with filters, search and pagination
+    const fetchProducts = useCallback(
+        async (search = searchTerm, page = currentPage, filters = {
+            brandCategory: selectedBrandCategory,
+            brand: selectedBrands,
+            category: selectedCategories,
+        }) => {
+            setLoading(true);
+            try {
+                const filterQuery = buildFilterQuery(filters);
+                const res = await getData(
+                    filterQuery
+                        ? `product/search-product?page=${page}&limit=${itemsPerPage}&search=${encodeURIComponent(search)}${filterQuery}`
+                        : `product/get-all-product?page=${page}&limit=${itemsPerPage}&search=${search}`
+                );
+                if (res.status) {
+                    setProducts(res.data || []);
+                    setTotalPages(res.totalPages || 1);
+                } else {
+                    toast.error("Failed to fetch product data");
+                }
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                toast.error("Error fetching products");
+            } finally {
+                setLoading(false);
+            }
+        },
+        [searchTerm, currentPage,
+            selectedBrandCategory,
+            selectedBrands, selectedCategories]
+    );
+
+    // Fetch products when filters, page or search change
     useEffect(() => {
         fetchProducts();
-    }, [currentPage]);
+    }, [fetchProducts]);
 
-    const debouncedSearch = useCallback(
+    // Debounced search
+    const debouncedSearch = useMemo(() =>
         debounce((query) => {
             setCurrentPage(1);
-            fetchProducts(query, 1);
-        }, 500),
-        []
-    );
+            fetchProducts(query, 1, {
+                brandCategory: selectedBrandCategory,
+                brand: selectedBrands,
+                category: selectedCategories,
+            });
+        }, 500), [
+        selectedBrandCategory,
+        selectedBrands, selectedCategories, fetchProducts]);
 
     const handleSearchChange = (e) => {
         const val = e.target.value;
@@ -122,15 +216,27 @@ const Page = ({ id }) => {
         debouncedSearch(val);
     };
 
-    const handleCategoryToggle = (catId) => {
-        setSearchTerm(catId);
-        debouncedSearch(catId);
-        setSelectedCategories((prev) =>
-            prev.includes(catId)
-                ? prev.filter((id) => id !== catId)
-                : [...prev, catId]
-        );
+    // Toggle handler for filters
+    const handleToggle = (filterType, id) => {
+        const updateSelected = (selected, setSelected) =>
+            selected.includes(id) ? selected.filter((item) => item !== id) : [...selected, id];
+
+        switch (filterType) {
+            case "brandCategory":
+                setSelectedBrandCategory((prev) => updateSelected(prev, setSelectedBrandCategory));
+                break;
+            case "brand":
+                setSelectedBrands((prev) => updateSelected(prev, setSelectedBrands));
+                break;
+            case "category":
+                setSelectedCategories((prev) => updateSelected(prev, setSelectedCategories));
+                break;
+            default:
+                break;
+        }
+        setCurrentPage(1);
     };
+
 
     const renderPagination = () => {
         const pages = [];
@@ -175,30 +281,10 @@ const Page = ({ id }) => {
     };
 
 
-    // const getCategoryCounts = () => {
-    //     const counts = {};
-
-    //     products.forEach(product => {
-    //         if (Array.isArray(product?.brand)) {
-    //             product?.brand?.forEach(catId => {
-    //                 counts[catId] = (counts[catId] || 0) + 1;
-    //             });
-    //         } else if (product?.category_id) {
-    //             // fallback for single category field
-    //             const catId = product.category_id;
-    //             counts[catId] = (counts[catId] || 0) + 1;
-    //         }
-    //     });
-
-    //     return counts;
-    // };
-
-    // const categoryCounts = useMemo(() => getCategoryCounts(), [products]);
-
     return (
         <>
             <HeroSection />
-            <section className="DynamicProductSec bg-black pt-3">
+            {id ? <section className="DynamicProductSec bg-black pt-3">
                 <div className="container">
                     <h2 className="mb-4 text-center">
                         All Products of <span className="text-theme bouncing-text">{brand?.name}</span>
@@ -217,72 +303,36 @@ const Page = ({ id }) => {
                         </div>
                     </div>
                 </div>
-            </section>
+            </section> : ''}
 
             <section className="All-pageSec bg-black">
                 <div className="container">
                     <div className="row">
                         <div className="col-lg-3 col-md-4">
-                            <aside className="AllSecfilters">
-                                <h2>Filters</h2>
-                                <div className="AllSecfilter-section">
-                                    <h3>Brand Category</h3>
-                                    <div className="filter-scroll">
-                                        {brandCategory?.map((item) => (
-                                            <label key={item.id} className="AllSecfilter-option">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selectedCategories.includes(item.id)}
-                                                    onChange={() => handleCategoryToggle(item?.id)}
-                                                />
-                                                {item?.name}
-                                                {/* ({categoryCounts[item?.id] || 0}) */}
-                                            </label>
-                                        ))}
-                                    </div>
-                                    <div className="AllSecfilter-section">
-                                        <h3>Brand</h3>
-                                        <div className="filter-scroll">
-                                            {allBrand?.map((item) => (
-                                                <label key={item.id} className="AllSecfilter-option">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={selectedCategories.includes(item.id)}
-                                                        onChange={() => handleCategoryToggle(item?.id)}
-                                                    />
-                                                    {item?.name}
-                                                    {/* ({categoryCounts[item?.id] || 0}) */}
-                                                </label>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <div className="AllSecfilter-section">
-                                        <h3>Category</h3>
-                                        <div className="filter-scroll">
-                                            {category?.map((item) => (
-                                                <label key={item.id} className="AllSecfilter-option">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={selectedCategories.includes(item.id)}
-                                                        onChange={() => handleCategoryToggle(item?.id)}
-                                                    />
-                                                    {item?.name}
-                                                    {/* ({categoryCounts[item?.id] || 0}) */}
-                                                </label>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* <div className="AllSecfilter-section">
-                                    <h3>Class</h3>
-                                    {["Air / Electrical Horn", "Bellow"].map((label, i) => (
-                                        <label key={i} className="AllSecfilter-option">
-                                            <input type="checkbox" /> {label} (100)
-                                        </label>
-                                    ))}
-                                </div> */}
+                            <aside className=" filters p-3 bg-dark rounded" style={{ marginTop: 40, height: "auto" }}>
+                                <FilterSection
+                                    title="Brand Category"
+                                    items={brandCategory}
+                                    selectedIds={selectedBrandCategory}
+                                    onToggle={(id) => handleToggle("brandCategory", id)}
+                                    defaultOpen={false}  // <-- Add this
+                                />
+                                <FilterSection
+                                    title="Brand"
+                                    items={allBrand}
+                                    selectedIds={selectedBrands}
+                                    onToggle={(id) => handleToggle("brand", id)}
+                                    defaultOpen={false}
+                                />
+                                <FilterSection
+                                    title="Category"
+                                    items={category}
+                                    selectedIds={selectedCategories}
+                                    onToggle={(id) => handleToggle("category", id)}
+                                    defaultOpen={false}
+                                />
                             </aside>
+
                         </div>
 
                         <div className="col-lg-9 col-md-8">
@@ -319,246 +369,3 @@ const Page = ({ id }) => {
 };
 
 export default Page;
-
-
-// "use client";
-
-// import React, { useCallback, useEffect, useMemo, useState } from 'react';
-// import Image from 'next/image';
-// import Link from 'next/link';
-// import parse from 'html-react-parser';
-// import debounce from "lodash.debounce";
-// import { toast } from "react-toastify";
-// import HeroSection from '@/app/components/HeroSection/page';
-// import { getData, serverURL } from '@/app/services/FetchNodeServices';
-// import './allproducts.css';
-
-// const ProductCard = ({ image, name, product_description, part_no, id }) => {
-//     const imgSrc = image?.startsWith("http") ? image : `${serverURL}/uploads/images/${image}`;
-
-//     return (
-//         <div className='AllProduct-card'>
-//             <div className='AllProductImg'>
-//                 <Image
-//                     src={imgSrc}
-//                     layout="responsive"
-//                     width={300}
-//                     height={250}
-//                     alt={name}
-//                     className='Allproduct-image'
-//                 />
-//             </div>
-//             <div className='Allproduct-info'>
-//                 <h3>{name}</h3>
-//                 <p className='Allproduct-details'>{parse(product_description || "")}</p>
-//                 <p className='Allproduct-part'><strong>Part Number:</strong> {part_no}</p>
-//                 <div className='Allproduct-actions'>
-//                     <Link href={`/pages/details-page/${id}`}>
-//                         <button className='btn btn-primary'>SHOP NOW</button>
-//                     </Link>
-//                 </div>
-//             </div>
-//         </div>
-//     );
-// };
-
-// const Page = ({ id }) => {
-//     const [brand, setBrand] = useState(null);
-//     const [brandCategory, setBrandCategory] = useState([]);
-//     const [selectedCategories, setSelectedCategories] = useState([]);
-//     const [products, setProducts] = useState([]);
-//     const [searchTerm, setSearchTerm] = useState(id || "");
-//     const [currentPage, setCurrentPage] = useState(1);
-//     const [totalPages, setTotalPages] = useState(1);
-//     const [loading, setLoading] = useState(false);
-//     const itemsPerPage = 10;
-
-//     // Fetch Brand
-//     useEffect(() => {
-//         if (!id) return;
-//         const fetchBrand = async () => {
-//             const res = await getData(`brand/get-all-brand-by-id/${id}`);
-//             if (res.status) setBrand(res.data);
-//         };
-//         fetchBrand();
-//     }, [id]);
-
-//     // Fetch Brand Categories
-//     useEffect(() => {
-//         const fetchBrandCategories = async () => {
-//             const res = await getData(`brandCategory/get-all-brand-category`);
-//             if (res.status) setBrandCategory(res.data);
-//         };
-//         fetchBrandCategories();
-//     }, []);
-
-//     const fetchProducts = async (search = searchTerm, page = currentPage) => {
-//         try {
-//             setLoading(true);
-//             const categoryParam = selectedCategories.join(",");
-//             const query = categoryParam ? `${search}&category=${categoryParam}` : search;
-//             const res = await getData(`product/get-all-product?page=${page}&limit=${itemsPerPage}&search=${query}`);
-
-//             if (res.status) {
-//                 setProducts(res.data || []);
-//                 setTotalPages(res.totalPages || 1);
-//             } else {
-//                 toast.error("Failed to fetch product data");
-//             }
-//         } catch (error) {
-//             console.error("API Fetch Error:", error);
-//             toast.error("Error fetching products");
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
-
-//     useEffect(() => {
-//         fetchProducts();
-//     }, [currentPage, selectedCategories]);
-
-//     const debouncedSearch = useCallback(
-//         debounce((query) => {
-//             setCurrentPage(1);
-//             fetchProducts(query, 1);
-//         }, 500),
-//         [selectedCategories]
-//     );
-
-//     const handleSearchChange = (e) => {
-//         const val = e.target.value;
-//         setSearchTerm(val);
-//         debouncedSearch(val);
-//     };
-
-//     const handleCategoryToggle = (catId) => {
-//         const updated = selectedCategories.includes(catId)
-//             ? selectedCategories.filter(id => id !== catId)
-//             : [...selectedCategories, catId];
-
-//         setSelectedCategories(updated);
-//         setCurrentPage(1);
-//     };
-
-//     const renderPagination = () => {
-//         const pages = [];
-//         for (let i = 1; i <= totalPages; i++) {
-//             if (
-//                 i === 1 || i === totalPages ||
-//                 (i >= currentPage - 2 && i <= currentPage + 2)
-//             ) {
-//                 pages.push(i);
-//             }
-//         }
-
-//         return (
-//             <div className="pagination d-flex justify-content-center gap-2 flex-wrap mb-5">
-//                 <button
-//                     className="btn btn-outline-light"
-//                     onClick={() => setCurrentPage((prev) => prev - 1)}
-//                     disabled={currentPage === 1}
-//                 >
-//                     Previous
-//                 </button>
-
-//                 {pages.map((page) => (
-//                     <button
-//                         key={page}
-//                         className={`btn ${page === currentPage ? "btn-light text-dark" : "btn-outline-light"}`}
-//                         onClick={() => setCurrentPage(page)}
-//                     >
-//                         {page}
-//                     </button>
-//                 ))}
-
-//                 <button
-//                     className="btn btn-outline-light"
-//                     onClick={() => setCurrentPage((prev) => prev + 1)}
-//                     disabled={currentPage === totalPages}
-//                 >
-//                     Next
-//                 </button>
-//             </div>
-//         );
-//     };
-
-//     return (
-//         <>
-//             <HeroSection />
-//             <section className="DynamicProductSec bg-black pt-3">
-//                 <div className="container">
-//                     <h2 className="mb-4 text-center">
-//                         All Products of <span className="text-theme bouncing-text">{brand?.name}</span>
-//                     </h2>
-
-//                     {brand && (
-//                         <div className="card h-100 shadow-sm mb-5">
-//                             <div className="card-body text-center">
-//                                 <h3 className="card-title text-primary">{brand.top_title}</h3>
-//                                 <p className="card-text" style={{ whiteSpace: "pre-line" }}>{brand.top_des}</p>
-//                                 <Link href="/pages/contact-us" className="btn btn-outline-primary mt-3">Continue Reading →</Link>
-//                             </div>
-//                         </div>
-//                     )}
-//                 </div>
-//             </section>
-
-//             <section className="All-pageSec bg-black">
-//                 <div className="container">
-//                     <div className="row">
-//                         <div className="col-lg-3 col-md-4">
-//                             <aside className="AllSecfilters">
-//                                 <h2>Filters</h2>
-//                                 <div className="AllSecfilter-section">
-//                                     <h3>Category</h3>
-//                                     <div className="filter-scroll">
-//                                         {brandCategory.map((item) => (
-//                                             <label key={item.id} className="AllSecfilter-option">
-//                                                 <input
-//                                                     type="checkbox"
-//                                                     checked={selectedCategories.includes(item.id)}
-//                                                     onChange={() => handleCategoryToggle(item.id)}
-//                                                 />
-//                                                 {item.name} ({item.productCount || 0})
-//                                             </label>
-//                                         ))}
-//                                     </div>
-//                                 </div>
-//                             </aside>
-//                         </div>
-
-//                         <div className="col-lg-9 col-md-8">
-//                             <section className="AllProduct-section pt-3">
-//                                 <div className="inputSec mb-3">
-//                                     <input
-//                                         className="search-input"
-//                                         onChange={handleSearchChange}
-//                                         type="text"
-//                                         placeholder="Search by Product Code or Name"
-//                                         value={searchTerm}
-//                                     />
-//                                 </div>
-
-//                                 <div className="Allproducts-grid">
-//                                     {loading ? (
-//                                         <p className="text-light">Loading...</p>
-//                                     ) : products.length > 0 ? (
-//                                         products.map((product) => (
-//                                             <ProductCard key={product.id} {...product} />
-//                                         ))
-//                                     ) : (
-//                                         <p className="text-light">No products found.</p>
-//                                     )}
-//                                 </div>
-
-//                                 {renderPagination()}
-//                             </section>
-//                         </div>
-//                     </div>
-//                 </div>
-//             </section>
-//         </>
-//     );
-// };
-
-// export default Page;

@@ -339,7 +339,7 @@ const AddBrand = () => {
                     {/* Category */}
                     <div className="col-md-6">
                         <label className="form-label">Category *</label>
-                        <select name="cat_id" className="form-select" value={formData.cat_id} onChange={handleChange} required>
+                        <select name="cat_id" className="form-select" value={formData?.cat_id} onChange={handleChange} required>
                             <option value="">Select Category</option>
                             {categories.map(cat => (
                                 <option key={cat.id} value={cat.id}>{cat.name}</option>

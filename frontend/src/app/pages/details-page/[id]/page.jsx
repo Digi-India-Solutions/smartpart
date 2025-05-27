@@ -301,9 +301,12 @@ import pic1 from "@/app/assets/products/item1.jpg";
 import brandpic from "@/app/assets/brands/suzuki.png";
 import { getData, postData, serverURL } from "@/app/services/FetchNodeServices";
 import "./productdetails.css";
+import { login } from "@/app/redux/slices/user-slice";
+import { useDispatch } from "react-redux";
 
 const ProductDetail = () => {
   const { id } = useParams();
+  const dispatch = useDispatch();
   const [product, setProduct] = useState({});
   const [formData, setFormData] = useState({});
   const [cart, setCart] = useState([]);
@@ -373,18 +376,18 @@ const ProductDetail = () => {
   // Handle Add to Cart
   const handleCartSubmit = () => {
     const storedCart = JSON.parse(localStorage.getItem("carts")) || [];
-  
+
     // Check if the product is already in the cart
     const productExists = storedCart.some(
       (item) => item.productId === product.id
     );
-  
+
     if (productExists) {
       Swal.fire("Item Already in Cart", "This product is already in your cart.", "info");
       router.push("/pages/addtocart"); // Redirect to cart
       return;
     }
-  
+
     // Add product to cart
     const newCartItem = {
       userId: null, // Replace with actual userId if needed
@@ -392,12 +395,13 @@ const ProductDetail = () => {
       product,
       quantity: 1,
     };
-  
+
     const updatedCart = [...storedCart, newCartItem];
     localStorage.setItem("carts", JSON.stringify(updatedCart));
     setCart(updatedCart);
+    dispatch(login({ cart: updatedCart }));
     setInCart(true);
-  
+
     Swal.fire("Added to Cart", "Product added to cart successfully.", "success");
   };
 
@@ -434,7 +438,7 @@ const ProductDetail = () => {
             </div>
 
             <h2>Description</h2>
-            <p className="w-75">{product?.product_description ? parse(product.product_description) : "No description available."}</p>
+            <div className="w-75">{product?.product_description ? parse(product?.product_description) : "No description available."}</div>
 
             <div className="Detail-product-buttons">
               <FaFacebook className="fs-1 facebook" />

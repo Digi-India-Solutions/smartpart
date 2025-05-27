@@ -12,7 +12,7 @@ const AllBrand = () => {
     const getApiData = async () => {
         try {
             const res = await getData("brand/get-all-brand");
-            console.log("Brand Data:", res.data);
+            // console.log("Brand Data:", res.data);
             setData(res.data);
         } catch (error) {
             console.log(error);

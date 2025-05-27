@@ -60,15 +60,15 @@ const AddProduct = () => {
     }
   };
 
-  useEffect(() => {
-    // Filter categories based on selected brand
-    if (data.category) {
-      const filtered = brandList.filter(cat => cat?.cat_id == data?.category);
-      setBrandFilter(filtered);
-    } else {
-      setBrandFilter([]);
-    }
-  }, [data.category, brandList]);
+  // useEffect(() => {
+  //   // Filter categories based on selected brand
+  //   if (data.category) {
+  //     const filtered = brandList.filter(cat => cat?.cat_id == data?.category);
+  //     setBrandFilter(filtered);
+  //   } else {
+  //     setBrandFilter([]);
+  //   }
+  // }, [data.category, brandList]);
   // console.log("DDDDDDD:--", data.brand);
   // console.log("DDDDDDD:--", data.brand);
   const handleChange = (e) => {
@@ -135,11 +135,11 @@ const AddProduct = () => {
             {/* Category Dropdown */}
             <div className="col-md-4 mb-3">
               <label>Category <sup className="text-danger">*</sup></label>
-              <select name="category" className="form-control" value={data.category} onChange={handleChange} required>
+              <select name="category" className="form-control" value={data?.category} onChange={handleChange} required>
                 <option value="">Select Category</option>
                 {categoryList.map((cat) => (
-                  <option key={cat._id} value={cat.id}>
-                    {cat.name}
+                  <option key={cat?.id} value={cat?.id}>
+                    {cat?.name}
                   </option>
                 ))}
               </select>
@@ -150,7 +150,7 @@ const AddProduct = () => {
               <label>Brand <sup className="text-danger">*</sup></label>
               <select name="brand" className="form-control" value={data.brand} onChange={handleChange} required>
                 <option value="">Select Brand</option>
-                {brandFilter?.map((brand) => (
+                {brandList?.map((brand) => (
                   <option key={brand?._id} value={brand?.id}>
                     {brand?.name}
                   </option>

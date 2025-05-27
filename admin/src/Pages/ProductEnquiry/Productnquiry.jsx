@@ -5,7 +5,7 @@ import { getData } from "../../services/FetchNodeServices";
 
 const ITEMS_PER_PAGE = 10;
 
-const AllCardEnquiry = () => {
+const AllProductEnquiry = () => {
     const [data, setData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -120,7 +120,7 @@ const AllCardEnquiry = () => {
             <ToastContainer />
             <div className="bread">
                 <div className="head">
-                    <h4>All Card Enquiries</h4>
+                    <h4>All Product Enquiries</h4>
                 </div>
             </div>
 
@@ -181,4 +181,4 @@ const AllCardEnquiry = () => {
     );
 };
 
-export default AllCardEnquiry;
+export default AllProductEnquiry;

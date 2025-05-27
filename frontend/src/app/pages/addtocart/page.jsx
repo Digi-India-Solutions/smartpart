@@ -239,19 +239,17 @@ import "intl-tel-input/build/css/intlTelInput.css";
 import "./addtocart.css";
 
 import pic1 from "@/app/assets/products/item1.jpg";
-import { postData } from "@/app/services/FetchNodeServices";
+import { postData, serverURL } from "@/app/services/FetchNodeServices";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import { login } from "@/app/redux/slices/user-slice";
+import { useDispatch } from "react-redux";
 
 const Page = () => {
+  const dispatch = useDispatch()
   const [cartItems, setCartItems] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
-    phone: "",
-  });
+  const [formData, setFormData] = useState({ name: "", email: "", message: "", phone: "", });
 
   // Load cart from localStorage
   useEffect(() => {
@@ -279,20 +277,20 @@ const Page = () => {
         ? {
           ...item,
           quantity:
-            type === "increase"
-              ? item.quantity + 1
-              : Math.max(item.quantity - 1, 1),
+            type === "increase" ? item.quantity + 1 : Math.max(item.quantity - 1, 1),
         }
         : item
     );
     setCartItems(updatedCart);
     localStorage.setItem("carts", JSON.stringify(updatedCart));
+    dispatch(login({ cart: updatedCart }));
   };
 
   const removeItem = (productId) => {
     const updatedCart = cartItems.filter((item) => item.productId !== productId);
     setCartItems(updatedCart);
     localStorage.setItem("carts", JSON.stringify(updatedCart));
+    dispatch(login({ cart: updatedCart }));
   };
 
   const handleInputChange = (e) => {
@@ -325,11 +323,11 @@ const Page = () => {
 
   };
 
-  const totalPrice = cartItems.reduce(
-    (acc, item) => acc + item.product.price * item.quantity,
+  const totalPrice = cartItems?.reduce(
+    (acc, item) => acc + item?.product?.price * item?.quantity,
     0
   );
-  console.log("Submitted Enquiry:", formData);
+  // console.log("Submitted Enquiry:", formData);
 
   return (
     <>
@@ -337,47 +335,36 @@ const Page = () => {
         <div className="container">
           <div className="row">
             {cartItems.length > 0 ? (
-              cartItems.map((item) => (
-                <div className="col-sm-12 mb-4" key={item.productId}>
+              cartItems.map((item, index) => (
+                <div className="col-sm-12 mb-4" key={index}>
                   <div className="row cart-item">
                     <div className="col-md-4 text-center">
                       <h4 className="text-warning">Item</h4>
                       <hr />
                       <Image
-                        src={
-                          item.product?.image
-                            ? `${item.product.image}`
-                            : pic1
-                        }
-                        alt={item.product?.name || "Product Image"}
-                        width={150}
-                        height={150}
-                        className="cart-img img-fluid"
-                      />
+                        src={item?.product?.image ? `${serverURL}/uploads/images/${item?.product?.image}` : pic1}
+                        alt={item?.product?.name || "Product Image"}
+                        width={150} height={150} className="cart-img img-fluid" />
                     </div>
 
                     <div className="col-md-4 text-center">
                       <h4 className="text-theme">Details</h4>
                       <hr />
                       <div className="cartDetailSec">
-                        <b>{item.product?.name}</b>
-                        <p>Part Number: {item.product?.part_no}</p>
-                        <p>Brand: {item.product?.brand_name}</p>
-                        <p>Qty: {item.quantity}</p>
+                        <b>{item?.product?.name}</b>
+                        <p>Part Number: {item?.product?.part_no}</p>
+                        <p>Brand: {item?.product?.brand_name}</p>
+                        <p>Qty: {item?.quantity}</p>
                         <div className="d-flex justify-content-center gap-2">
                           <button
                             className="btn btn-sm btn-secondary"
-                            onClick={() =>
-                              updateQuantity(item.productId, "decrease")
-                            }
+                            onClick={() => updateQuantity(item?.productId, "decrease")}
                           >
                             -
                           </button>
                           <button
                             className="btn btn-sm btn-secondary"
-                            onClick={() =>
-                              updateQuantity(item.productId, "increase")
-                            }
+                            onClick={() => updateQuantity(item?.productId, "increase")}
                           >
                             +
                           </button>
@@ -390,7 +377,7 @@ const Page = () => {
                       <hr />
                       <MdDeleteForever
                         className="fs-2 text-danger cursor-pointer"
-                        onClick={() => removeItem(item.productId)}
+                        onClick={() => removeItem(item?.productId)}
                       />
                     </div>
                   </div>
@@ -425,59 +412,27 @@ const Page = () => {
         </Modal.Header>
         <Modal.Body className="bg-dark text-light">
           <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label className="form-label">Name</label>
-              <input
-                type="text"
-                className="form-control"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                placeholder="Enter your name"
-                required
-              />
-            </div>
+            <div className="row">
+              <div className=" col-md-12 mb-3">
+                <label className="form-label">Name</label>
+                <input type="text" className="form-control" name="name" value={formData.name} onChange={handleInputChange} placeholder="Enter your name" required />
+              </div>
 
-            <div className="mb-3">
-              <label className="form-label">Email</label>
-              <input
-                type="email"
-                className="form-control"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                placeholder="Enter your email"
-                required
-              />
-            </div>
+              <div className=" col-md-6 mb-3">
+                <label className="form-label">Email</label>
+                <input type="email" className="form-control" name="email" value={formData.email} onChange={handleInputChange} placeholder="Enter your email" required />
+              </div>
 
-            <div className="mb-3">
-              <label className="form-label">Phone</label>
-              <input
-                type="tel"
-                id="phone"
-                className="form-control"
-                placeholder="Enter phone number"
-                name="phone"
-                value={formData?.phone}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
+              <div className=" col-md-6 mb-3">
+                <label className="form-label">Phone</label>
+                <input type="tel" id="phone" className="form-control" placeholder="Enter phone number" name="phone" value={formData?.phone} onChange={handleInputChange} required />
+              </div>
 
-            <div className="mb-3">
-              <label className="form-label">Message</label>
-              <textarea
-                className="form-control"
-                rows={4}
-                name="message"
-                value={formData.message}
-                onChange={handleInputChange}
-                placeholder="Write your message..."
-                required
-              ></textarea>
+              <div className=" col-md-12 mb-3">
+                <label className="form-label">Message</label>
+                <textarea className="form-control" rows={4} name="message" value={formData.message} onChange={handleInputChange} placeholder="Write your message..." required></textarea>
+              </div>
             </div>
-
             <div className="modal-footer">
               <Button variant="secondary" onClick={() => setShowModal(false)}>
                 Close

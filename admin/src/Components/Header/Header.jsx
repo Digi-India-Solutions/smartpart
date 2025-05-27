@@ -44,7 +44,7 @@ const Header = () => {
             <li><Link to="/all-brand" onClick={handletoggleBtn}> <i class="fa-solid fa-tag"></i> Brand</Link></li>
             <li><Link to="/all-products" onClick={handletoggleBtn}> <i class="fa-solid fa-layer-group"></i> Product</Link></li>
             <li><Link to="/all-blog" onClick={handletoggleBtn}> <i class="fa-solid fa-layer-group"></i> Blog</Link></li>
-            <li><Link to="/all-card-enquiry" onClick={handletoggleBtn}> <i class="fa-solid fa-layer-group"></i>Card Enquiry</Link></li>
+            <li><Link to="/all-card-enquiry" onClick={handletoggleBtn}> <i class="fa-solid fa-layer-group"></i>Product Enquiry</Link></li>
             <li><Link to="/all-enquiry" onClick={handletoggleBtn}> <i class="fa-solid fa-layer-group"></i> Contact Enquiry</Link></li>
             {/* <li><Link to="/all-contact" onClick={handletoggleBtn}> <i class="fa-solid fa-layer-group"></i>  Contact Us</Link></li> */}
             {/* <li><Link to="/all-shop-banners" onClick={handletoggleBtn}> <i class="fa-brands fa-unsplash"></i>Contact Query</Link></li> */}

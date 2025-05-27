@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import "./navbar.css";
 import websitelogo from '../../assets/log.png';
@@ -7,8 +7,28 @@ import { FaShoppingCart } from "react-icons/fa";
 import { IoIosPersonAdd } from "react-icons/io";
 import { FaWhatsapp } from "react-icons/fa";
 import { AiFillWechat } from "react-icons/ai";
+import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
 
 const Navbar = () => {
+  const [cartItems, setCartItems] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+  const { carts } = useSelector(state => state.user);
+
+  console.log("XXXXXXXXXXCART:-",carts)
+  useEffect(() => {
+    const localCart = JSON.parse(localStorage.getItem("carts")) || [];
+    setCartItems(localCart);
+  }, [carts]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/pages/all-products?query=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
   return (
 <>
     <nav className="navbar navbar-expand-lg sticky-top  top-0">
@@ -48,22 +68,30 @@ const Navbar = () => {
           </ul>
 
           {/* Search Bar */}
-          <form className="d-flex">
-            <div className="input-group">
-              <input type="text" className="form-control" placeholder="Search" />
-              <button className="btn btn-secondary" type="submit">Search</button>
-            </div>
-          </form>
+             <form className="d-flex me-2" onSubmit={handleSearch}>
+               <div className="input-group">
+                <input type="text" className="form-control" placeholder="Search products" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} aria-label="Search"/>
+                <button className="btn btn-secondary" type="submit">
+                  Search
+                </button>
+              </div>
+            </form>
 
           {/* Icons */}
           <div className="d-flex ms-1">
-            <Link className="nav-link" href="/pages/signup">
+            {/* <Link className="nav-link" href="/pages/signup">
               <IoIosPersonAdd className="fs-3"/>
-            </Link>
+            </Link> */}
             <div className="float-end d-flex">
-              <Link className="nav-link" href="/pages/addtocart">
-                <FaShoppingCart className="fs-3" />
+            <Link className="nav-link position-relative" href="/pages/addtocart">
+                <FaShoppingCart className="fs-4 text-white" />
+                {cartItems.length > 0 && (
+                  <span className="position-absolute top-2 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+                    {cartItems.length}
+                  </span>
+                )}
               </Link>
+
             </div>
             <Link className="nav-link ms-1" href="#">
               <i className="bi bi-whatsapp text-white fs-4"></i>
@@ -103,6 +131,129 @@ const Navbar = () => {
 };
 
 export default Navbar;
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+// import React, { useEffect, useState } from "react";
+// import Link from "next/link";
+// import Image from "next/image";
+// import { useRouter } from "next/navigation";
+// import { FaShoppingCart, FaWhatsapp } from "react-icons/fa";
+// import { AiFillWechat } from "react-icons/ai";
+// import websitelogo from '../../assets/log.png';
+// import "./navbar.css";
+
+// const Navbar = () => {
+//   const [cartItems, setCartItems] = useState([]);
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const router = useRouter();
+
+//   useEffect(() => {
+//     const localCart = JSON.parse(localStorage.getItem("carts")) || [];
+//     setCartItems(localCart);
+//   }, []);
+
+//   const handleSearch = (e) => {
+//     e.preventDefault();
+//     if (searchQuery.trim()) {
+//       router.push(`/pages/search?query=${encodeURIComponent(searchQuery.trim())}`);
+//     }
+//   };
+
+//   return (
+//     <>
+//       <nav className="navbar navbar-expand-lg sticky-top top-0 bg-dark">
+//         <div className="container-fluid">
+//           {/* Logo */}
+//           <Link className="navbar-brand" href="/">
+//             <Image src={websitelogo} alt="Website Logo" className="logo" />
+//           </Link>
+
+//           {/* Toggler */}
+//           <button
+//             className="navbar-toggler"
+//             type="button"
+//             data-bs-toggle="collapse"
+//             data-bs-target="#navbarNav"
+//             aria-controls="navbarNav"
+//             aria-expanded="false"
+//             aria-label="Toggle navigation"
+//           >
+//             <span className="navbar-toggler-icon"></span>
+//           </button>
+
+//           {/* Navbar Content */}
+//           <div className="collapse navbar-collapse" id="navbarNav">
+//             <ul className="navbar-nav mx-auto">
+//               {["Home", "Shop", "Brands", "About Us", "Contact Us", "Blogs"].map((item, i) => (
+//                 <li key={i} className="nav-item">
+//                   <Link className="nav-link" href={`/pages/${item.toLowerCase().replace(/ /g, "-")}`}>
+//                     {item}
+//                   </Link>
+//                 </li>
+//               ))}
+//             </ul>
+
+//             {/* Search */}
+//             <form className="d-flex me-2" onSubmit={handleSearch}>
+//               <div className="input-group">
+//                 <input
+//                   type="text"
+//                   className="form-control"
+//                   placeholder="Search products"
+//                   value={searchQuery}
+//                   onChange={(e) => setSearchQuery(e.target.value)}
+//                   aria-label="Search"
+//                 />
+//                 <button className="btn btn-secondary" type="submit">
+//                   Search
+//                 </button>
+//               </div>
+//             </form>
+
+//             {/* Icons */}
+//             <div className="d-flex align-items-center gap-3 position-relative">
+//               {/* Cart Icon */}
+//               <Link className="nav-link position-relative" href="/pages/addtocart">
+//                 <FaShoppingCart className="fs-4 text-white" />
+//                 {cartItems.length > 0 && (
+//                   <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+//                     {cartItems.length}
+//                   </span>
+//                 )}
+//               </Link>
+
+//               {/* WhatsApp */}
+//               <Link className="nav-link" href="https://wa.me/918826477077" target="_blank" rel="noopener noreferrer">
+//                 <FaWhatsapp className="fs-4 text-success" title="WhatsApp" />
+//               </Link>
+
+//               {/* WeChat */}
+//               <div className="nav-link">
+//                 <AiFillWechat className="fs-4 text-primary" title="WeChat" />
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </nav>
+
+//       {/* Floating WhatsApp Button */}
+//       <Link href="https://wa.me/918826477077" target="_blank" className="whatsapp-fix-link">
+//         <div className="whatsap-fix">
+//           <FaWhatsapp className="fs-1" />
+//         </div>
+//       </Link>
+
+//       {/* Floating WeChat Button */}
+//       <div className="wechat">
+//         <AiFillWechat className="fs-1" />
+//       </div>
+//     </>
+//   );
+// };
+
+// export default Navbar;
 
 
 
