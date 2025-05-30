@@ -74,7 +74,7 @@ const filterAftermarkets = brand?.filter((b)=>b?.brand_category_name==='TOP AFTE
             <h5>Categories</h5>
             <ul className="list-unstyled small">
   {categorys.slice(0, 5).map((cat, index) => (
-    <li key={cat._id || index}>
+    <li key={cat.id || index}>
       <Link href={{ pathname: `/pages/all-products`}}className="text-light text-decoration-none">
       {cat?.name}
       </Link>
@@ -88,7 +88,7 @@ const filterAftermarkets = brand?.filter((b)=>b?.brand_category_name==='TOP AFTE
             <h5>OEM Brands</h5>  
             <ul className="list-unstyled small">
             {filterOEMBrand?.slice(0, 5).map((brand, index) => (
-              <li> <Link href='/pages/all-products' className="text-light text-decoration-none ">{brand?.name}</Link></li>
+              <li key={brand?.id || index}> <Link href='/pages/all-products' className="text-light text-decoration-none ">{brand?.name}</Link></li>
             ))}
             <li> <Link href='/pages/all-products' className="text-light text-decoration-none ">View All</Link></li>
             </ul>
@@ -98,7 +98,7 @@ const filterAftermarkets = brand?.filter((b)=>b?.brand_category_name==='TOP AFTE
             <h5>Aftermarkets Brands</h5>
             <ul className="list-unstyled small">
             {filterAftermarkets?.slice(0, 5).map((brand, index) => (
-              <li> <Link href='/pages/all-products' className="text-light text-decoration-none ">{brand?.name}</Link></li>
+              <li key={brand?.id || index}> <Link href='/pages/all-products' className="text-light text-decoration-none ">{brand?.name}</Link></li>
             ))}
             <li> <Link href='/pages/all-products' className="text-light text-decoration-none">View All</Link></li>
             </ul>

@@ -10,22 +10,21 @@ exports.createProduct = async (req, res) => {
 
         const {
             name, brand, trending, category,
-            warranty, product_description, meta_title,
+            product_description, meta_title,
             meta_description, meta_keyword, model,
-            part_no, price, special_price, status
+            part_no, status, brand_category
         } = req.body;
 
         const image = req.file ? req.file.filename : null;
 
-        console.log("image:-", image);
 
         console.log("FIELE:-", req.file);
 
         // Validate required fields
-        if (!name || !brand || !price || !image) {
+        if (!name || !brand || !image) {
             return res.status(400).json({
                 success: false,
-                message: "Required fields are missing (name, brand, price,  image)"
+                message: "Required fields are missing (name, brand,   image)"
             });
         }
 
@@ -35,18 +34,18 @@ exports.createProduct = async (req, res) => {
         const sql = `
             INSERT INTO cyb_product 
             (
-                name, trending, warranty, product_description, 
+                name, trending, brand_category, product_description, 
                 meta_title, meta_description, meta_keyword,
                 model, part_no,  brand, image,category,
-                price, special_price, status, create_date, modify_date
+                 status, create_date, modify_date
             ) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         const values = [
             name,
             trending === "true" || trending === true ? 1 : 0,
-            warranty || "",
+            brand_category,
             product_description || "",
             meta_title || "",
             meta_description || "",
@@ -56,8 +55,6 @@ exports.createProduct = async (req, res) => {
             brand,
             image,
             category,
-            parseFloat(price),
-            special_price ? parseFloat(special_price) : 0,
             status === "true" || status === true ? 1 : 0,
             create_date,
             modify_date
@@ -183,131 +180,73 @@ exports.getAllProductById = async (req, res) => {
     }
 };
 
-// Update product
-// exports.updateProduct = async (req, res) => {
-//     try {
-//         const id = req.params.id;
-//         const {
-//             name, categoryname, brand, trending,
-//             warranty, product_description, meta_title, meta_description, meta_keyword,
-//             model, part_no, quantity, price, special_price, status
-//         } = req.body;
+exports.updateProduct = async (req, res) => {
+    try {
+        const id = req.params.id;
 
-//         let image = req.file ? req.file.filename : null;
+        const {
+            name, brand, trending, brand_category,
+            product_description, meta_title,
+            meta_description, meta_keyword,
+            model, part_no, status, category
+        } = req.body;
 
-//         // Get the existing product
-//         const [existingRows] = await pool.query("SELECT image FROM products WHERE id = ?", [id]);
+        const newImage = req.file ? req.file.filename : null;
 
-//         if (existingRows.length === 0) {
-//             return res.status(404).json({ success: false, message: "Product not found" });
-//         }
-
-//         const existing = existingRows[0];
-
-//         // If new image uploaded, delete old one
-//         if (image && existing.image) {
-//             const oldPath = path.join(__dirname, "../../uploads/images", existing.image);
-//             if (fs.existsSync(oldPath)) {
-//                 fs.unlinkSync(oldPath);
-//             }
-//         } else {
-//             image = existing.image; // Keep the old image if new one not uploaded
-//         }
-
-//         const sql = `
-//             UPDATE products SET
-//             name = ?, categoryname = ?, brand = ?, trending = ?, warranty = ?, product_description = ?, meta_title = ?,
-//             meta_description = ?, meta_keyword = ?, model = ?, part_no = ?, quantity = ?, price = ?, special_price = ?, 
-//             status = ?, image = ?
-//             WHERE id = ?
-//         `;
-
-//         await pool.query(sql, [
-//             name, categoryname, brand, trending ? 1 : 0, warranty, product_description, meta_title,
-//             meta_description, meta_keyword, model, part_no, quantity, price, special_price, status ? 1 : 0, image, id
-//         ]);
-
-//         return res.status(200).json({ status: true, message: "Product updated successfully!" });
-
-//     } catch (error) {
-//         console.error("Update product error:", error);
-//         res.status(500).json({ success: false, message: "Server error" });
-//     }
-// };
-
-
-exports.updateProduct = (req, res) => {
-    const id = req.params.id;
-
-    const {
-        name, brand, trending,
-        warranty, product_description, meta_title, meta_description, meta_keyword,
-        model, part_no, price, special_price, status, category
-    } = req.body;
-
-    let newImage = req.file ? req.file.filename : null;
-
-    // Step 1: Get existing product image using callback
-    pool.query("SELECT image FROM cyb_product WHERE id = ?", [id], (error, rows) => {
-        if (error) {
-            console.error("Database error:", error);
-            return res.status(500).json({ success: false, message: "Database error" });
-        }
-
-        if (rows.length === 0) {
-            return res.status(404).json({ success: false, message: "Product not found" });
-        }
-
-        const existing = rows[0];
-        let imageToUse = existing.image;
-
-        // Step 2: Delete old image if new one uploaded
-        if (newImage) {
-            const oldImagePath = path.join(__dirname, "../../uploads/images", existing.image);
-            if (fs.existsSync(oldImagePath)) {
-                fs.unlinkSync(oldImagePath);
+        // Step 1: Get existing product
+        pool.query("SELECT image FROM cyb_product WHERE id = ?", [id], (error, rows) => {
+            if (error) {
+                console.error("Database fetch error:", error);
+                return res.status(500).json({ success: false, message: "Database error", error });
             }
-            imageToUse = newImage;
-        }
 
-        // Step 3: Update the product with new data
-        const sql = `
-            UPDATE cyb_product SET
-                name = ?, brand = ?, category=?,trending = ?, warranty = ?, product_description = ?, 
-                meta_title = ?, meta_description = ?, meta_keyword = ?, 
-                model = ?, part_no = ?, price = ?, special_price = ?, 
-                status = ?, image = ?, modify_date = NOW()
-            WHERE id = ?
-        `;
-
-        const values = [
-            name || "",
-            brand || "",
-            category || "",
-            trending === "true" || trending === true ? 1 : 0,
-            warranty || "",
-            product_description || "",
-            meta_title || "",
-            meta_description || "",
-            meta_keyword || "",
-            model || "",
-            part_no || "",
-            parseFloat(price) || 0,
-            special_price ? parseFloat(special_price) : 0,
-            status === "true" || status === true ? 1 : 0,
-            imageToUse,
-            id
-        ];
-
-        pool.query(sql, values, (updateError, updateResult) => {
-            if (updateError) {
-                console.error("Update product error:", updateError);
-                return res.status(500).json({ status: false, message: "Server error" });
+            if (rows.length === 0) {
+                return res.status(404).json({ success: false, message: "Product not found" });
             }
-            return res.status(200).json({ status: true, message: "Product updated successfully!" });
+
+            const existingImage = rows[0].image;
+            let imageToUse = existingImage;
+
+            // Step 2: Delete old image if new one uploaded
+            if (newImage) {
+                const oldImagePath = path.join(__dirname, "../../uploads/images", existingImage);
+                if (fs.existsSync(oldImagePath)) {
+                    fs.unlinkSync(oldImagePath);
+                }
+                imageToUse = newImage;
+            }
+
+            // Step 3: Update product
+            const sql = `
+                UPDATE cyb_product SET
+                    name = ?, trending = ?, brand_category = ?, product_description = ?,
+                    meta_title = ?, meta_description = ?, meta_keyword = ?,
+                    model = ?, part_no = ?, brand = ?, image = ?, category = ?,
+                    status = ?, modify_date = NOW()
+                WHERE id = ?
+            `;
+
+            const values = [
+                name || "", trending === "true" || trending === true ? 1 : 0, brand_category || "", product_description || "", meta_title || "",
+                meta_description || "", meta_keyword || "", model || "", part_no || "", brand || "",
+                imageToUse, category || "", status === "true" || status === true ? 1 : 0, id
+            ];
+
+            pool.query(sql, values, (updateError, result) => {
+                if (updateError) {
+                    console.error("Update error:", updateError);
+                    return res.status(500).json({ status: false, message: "Database error", error: updateError });
+                }
+
+                return res.status(200).json({ status: true, message: "Product updated successfully!" });
+            });
         });
-    });
+    } catch (error) {
+        console.error("Update product error:", error);
+        return res.status(500).json({ status: false, message: "Server error", error });
+    }
 };
+
 // Delete product
 exports.deleteProduct = async (req, res) => {
     const id = req.params.id;
@@ -443,6 +382,22 @@ exports.searchProduct = async (req, res) => {
 
     } catch (error) {
         console.error("Search product error:", error);
+        return res.status(500).json({ status: false, message: "Server error" });
+    }
+};
+
+exports.getAllProductWithoutPagination = async (req, res) => {
+    try {
+        // Promisify the pool.query using async/await
+        pool.query('SELECT * FROM cyb_product', (err, results) => {
+            if (err) {
+                console.error("Database query error:", err);
+                return res.status(500).json({ status: false, message: "Database data fetch error" });
+            }
+            return res.status(200).json({ status: true, message: "Products fetched successfully", data: results });
+        });
+    } catch (error) {
+        console.error("Unexpected error:", error);
         return res.status(500).json({ status: false, message: "Server error" });
     }
 };

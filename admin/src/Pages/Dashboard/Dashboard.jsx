@@ -1,37 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
-  FaList, FaTags, FaBoxOpen, FaImage, FaEnvelope, FaRocket,
+  FaList, FaTags, FaBoxOpen, FaImage, FaEnvelope, FaRocket, FaRegNewspaper
 } from 'react-icons/fa';
 import './dashboard.css';
 import { Link } from 'react-router-dom';
+import { getData } from '../../services/FetchNodeServices'
 
 const Dashboard = () => {
   const [categories, setCategories] = useState(0);
-  const [subcategories, setSubcategories] = useState(0);
+  const [brand, setBrand] = useState(0);
   const [products, setProducts] = useState(0);
   const [banner, setBanner] = useState(0);
   const [contactEnquiries, setContactEnquiries] = useState(0);
   const [newLanch, setNewLanch] = useState(0);
+  const [blog, setBlog] = useState(0);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [categoryRes, subcategoryRes, productRes, bannerRes, contactRes, enquiryRes] = await Promise.all([
-          axios.get('http://localhost:8000/api/category'),
-          axios.get('http://localhost:8000/api/subcategory'),
-          axios.get('http://localhost:8000/api/product'),
-          axios.get('http://localhost:8000/api/banner'),
-          axios.get('http://localhost:8000/api/contact'),
-          axios.get('http://localhost:8000/api/get-all-enquiry'),
+        const [categoryRes, brandRes, productRes, bannerRes, contactRes, enquiryRes, blogRes] = await Promise.all([
+          getData('category/get-all-categorys'),
+          getData('brand/get-all-brand'),
+          getData('product/get-all-product-without-pagination'),
+          getData('banner-image/get-all-banner-image'),
+          getData('enquiry/get-all-enquiry'),
+          getData('cardEnquiry/get-all-card-enquiry'),
+          getData('blog/get-all-blog')
         ]);
 
-        setCategories(categoryRes.data.data.length);
-        setSubcategories(subcategoryRes.data.data.length);
-        setProducts(productRes.data.data.length);
-        setBanner(bannerRes.data.data.length);
-        setContactEnquiries(contactRes.data.data.length);
-        setNewLanch(enquiryRes.data.data.length);
+        setCategories(categoryRes?.data?.length);
+        setBrand(brandRes?.data?.length);
+        setProducts(productRes?.data?.length);
+        setBanner(bannerRes?.data?.length);
+        setContactEnquiries(contactRes?.data?.length);
+        setNewLanch(enquiryRes?.data?.length);
+        setBlog(blogRes?.data?.blogs?.length);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
       }
@@ -42,11 +46,12 @@ const Dashboard = () => {
 
   const data = [
     { label: 'All Categories', value: categories, icon: <FaList />, link: '/all-category' },
-    { label: 'Subcategories', value: subcategories, icon: <FaTags />, link: '/all-tags' },
+    { label: 'All Brand', value: brand, icon: <FaTags />, link: '/all-brand' },
     { label: 'Products', value: products, icon: <FaBoxOpen />, link: '/all-products' },
     { label: 'All Banners', value: banner, icon: <FaImage />, link: '/all-banners' },
-    { label: 'Contact Enquiries', value: contactEnquiries, icon: <FaEnvelope />, link: '/all-shop-banners' },
-    { label: 'Enquiry Queries', value: newLanch, icon: <FaRocket />, link: '/all-voucher' },
+    { label: 'Contact Enquiries', value: contactEnquiries, icon: <FaEnvelope />, link: '/all-enquiry' },
+    { label: 'Enquiry Queries', value: newLanch, icon: <FaRocket />, link: '/all-card-enquiry' },
+    { label: 'All Blog', value: blog, icon: <FaRegNewspaper />, link: '/all-blog' },
   ];
 
   return (

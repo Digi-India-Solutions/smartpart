@@ -319,8 +319,8 @@ const AllProduct = () => {
               <th>Brand Name</th>
               <th>Part No.</th>
               <th>Image</th>
-              <th>Price (Rs)</th>
-              <th>Special Price (Rs)</th>
+              {/* <th>Price (Rs)</th>
+              <th>Special Price (Rs)</th> */}
               <th>Edit</th>
               <th>Delete</th>
             </tr>
@@ -336,18 +336,18 @@ const AllProduct = () => {
                   <td>
                     <img
                       src={
-                        item.image
-                          ? item.image.includes("cloudinary")
-                            ? item.image
-                            : `${serverURL}/uploads/images/${item.image}`
+                        item?.image
+                          ? item?.image.includes("cloudinary")
+                            ? item?.image
+                            : `${serverURL}/uploads/images/${item?.image}`
                           : "https://via.placeholder.com/50"
                       }
                       alt="Product"
                       style={{ height: 50 }}
                     />
                   </td>
-                  <td>{item.price}</td>
-                  <td>{item.special_price}</td>
+                  {/* <td>{item.price}</td>
+                  <td>{item.special_price}</td> */}
                   <td>
                     <Link className="bt edit" to={`/edit-product/${item?.id}`}>
                       Edit <i className="fa-solid fa-pen-to-square"></i>

@@ -1,11 +1,145 @@
+// import React, { useEffect, useState } from "react";
+// import Link from "next/link";
+// import "./navbar.css";
+// import websitelogo from '../../assets/log.png';
+// import Image from "next/image";
+// import { FaShoppingCart } from "react-icons/fa";
+// import { IoIosPersonAdd } from "react-icons/io";
+// import { FaWhatsapp } from "react-icons/fa";
+// import { AiFillWechat } from "react-icons/ai";
+// import { useRouter } from "next/navigation";
+// import { useSelector } from "react-redux";
+
+// const Navbar = () => {
+//   const [cartItems, setCartItems] = useState([]);
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const router = useRouter();
+//   const { carts } = useSelector(state => state.user);
+
+//   // console.log("XXXXXXXXXXCART:-",carts)
+//   useEffect(() => {
+//     const localCart = JSON.parse(localStorage.getItem("carts")) || [];
+//     setCartItems(localCart);
+//   }, [carts]);
+
+//   const handleSearch = (e) => {
+//     e.preventDefault();
+//     if (searchQuery.trim()) {
+//       router.push(`/pages/all-products?query=${encodeURIComponent(searchQuery.trim())}`);
+//     }
+//     setSearchQuery('')
+//   };
+
+//   return (
+// <>
+//     <nav className="navbar navbar-expand-lg sticky-top  top-0">
+//       <div className="container-fluid">
+//         {/* Logo */}
+//         <Link className="navbar-brand" href="/">
+//           <Image src={websitelogo} alt="websitelogo" className="logo"/>
+//         </Link>
+
+//         {/* Navbar Toggler for Mobile */}
+//         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+//           <span className="navbar-toggler-icon"></span>
+//         </button>
+
+//         {/* Navbar Links */}
+//         <div className="collapse navbar-collapse" id="navbarNav">
+//           <ul className="navbar-nav mx-auto">
+//             <li className="nav-item">
+//               <Link className="nav-link active" href="/">Home</Link>
+//             </li>
+//             <li className="nav-item">
+//               <Link className="nav-link" href="/pages/shop">Shop</Link>
+//             </li>
+//             <li className="nav-item">
+//               <Link className="nav-link" href="/pages/brands">Brands</Link>
+//             </li>
+//             <li className="nav-item">
+//               <Link className="nav-link" href="/pages/about-us">About Us</Link>
+//             </li>
+//             <li className="nav-item">
+//               <Link className="nav-link" href="/pages/contact-us">Contact Us</Link>
+//             </li>
+//             <li className="nav-item">
+//               <Link className="nav-link" href="/pages/blog">Blogs</Link>
+//             </li>
+
+//           </ul>
+
+//           {/* Search Bar */}
+//              <form className="d-flex me-2" onSubmit={handleSearch}>
+//                <div className="input-group">
+//                 <input type="text" className="form-control" placeholder="Search products" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} aria-label="Search"/>
+//                 <button className="btn btn-secondary" type="submit">
+//                   Search
+//                 </button>
+//               </div>
+//             </form>
+
+//           {/* Icons */}
+//           <div className="d-flex ms-1">
+//             {/* <Link className="nav-link" href="/pages/signup">
+//               <IoIosPersonAdd className="fs-3"/>
+//             </Link> */}
+//             <div className="float-end d-flex">
+//             <Link className="nav-link position-relative" href="/pages/addtocart">
+//                 <FaShoppingCart className="fs-4 text-white" />
+//                 {cartItems.length > 0 && (
+//                   <span className="position-absolute top-2 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+//                     {cartItems.length}
+//                   </span>
+//                 )}
+//               </Link>
+
+//             </div>
+//             <Link className="nav-link ms-1" href="#">
+//               <i className="bi bi-whatsapp text-white fs-4"></i>
+//             </Link>
+//           </div>
+//         </div>
+//       </div>
+//     </nav>
+    
+//        {/* <Link
+//       href="https://wa.me/918826477077"
+//       target="_blank"
+//       rel="noopener noreferrer"
+//       className="fixed bottom-4 right-4 flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-lg hover:bg-green-100 transition-all duration-300 z-50"
+//     >
+//       <FaWhatsapp className="text-green-500 text-2xl" />
+//       <span className="text-sm font-medium text-black">+91 88264 77077</span>
+//     </Link> */}
+
+//   <Link 
+//   href="https://wa.me/918826477077"
+//   target="_blank"
+//   >
+//      <div className="whatsap-fix">
+//     <FaWhatsapp  className="fs-1  "/>
+//     </div> 
+//     </Link>
+    
+
+//     <div className="wechat">
+//     <AiFillWechat  className="fs-1  "/>
+//     </div>
+
+// </>
+
+//   );
+// };
+
+// export default Navbar;
+
+
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import "./navbar.css";
 import websitelogo from '../../assets/log.png';
 import Image from "next/image";
-import { FaShoppingCart } from "react-icons/fa";
-import { IoIosPersonAdd } from "react-icons/io";
-import { FaWhatsapp } from "react-icons/fa";
+import { FaShoppingCart, FaWhatsapp } from "react-icons/fa";
 import { AiFillWechat } from "react-icons/ai";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
@@ -13,10 +147,10 @@ import { useSelector } from "react-redux";
 const Navbar = () => {
   const [cartItems, setCartItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [productSuggestions, setProductSuggestions] = useState([]);
   const router = useRouter();
   const { carts } = useSelector(state => state.user);
 
-  console.log("XXXXXXXXXXCART:-",carts)
   useEffect(() => {
     const localCart = JSON.parse(localStorage.getItem("carts")) || [];
     setCartItems(localCart);
@@ -26,111 +160,126 @@ const Navbar = () => {
     e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/pages/all-products?query=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+      setProductSuggestions([]);
     }
   };
 
+  const handleSuggestionClick = (product) => {
+    router.push(`/pages/product/${product.slug || product._id}`);
+    setSearchQuery('');
+    setProductSuggestions([]);
+  };
+
+  const fetchSuggestions = async (query) => {
+    try {
+      const res = await fetch(`/api/products/search?query=${encodeURIComponent(query)}`);
+      const data = await res.json();
+      setProductSuggestions(data.products || []);
+    } catch (err) {
+      console.error("Failed to fetch suggestions:", err);
+      setProductSuggestions([]);
+    }
+  };
+
+  useEffect(() => {
+    if (searchQuery.trim().length > 1) {
+      fetchSuggestions(searchQuery.trim());
+    } else {
+      setProductSuggestions([]);
+    }
+  }, [searchQuery]);
+
   return (
-<>
-    <nav className="navbar navbar-expand-lg sticky-top  top-0">
-      <div className="container-fluid">
-        {/* Logo */}
-        <Link className="navbar-brand" href="/">
-          <Image src={websitelogo} alt="websitelogo" className="logo"/>
-        </Link>
+    <>
+      <nav className="navbar navbar-expand-lg sticky-top top-0">
+        <div className="container-fluid">
+          {/* Logo */}
+          <Link className="navbar-brand" href="/">
+            <Image src={websitelogo} alt="websitelogo" className="logo" />
+          </Link>
 
-        {/* Navbar Toggler for Mobile */}
-        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-          <span className="navbar-toggler-icon"></span>
-        </button>
+          {/* Mobile toggle */}
+          <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span className="navbar-toggler-icon"></span>
+          </button>
 
-        {/* Navbar Links */}
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav mx-auto">
-            <li className="nav-item">
-              <Link className="nav-link active" href="/">Home</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" href="/pages/shop">Shop</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" href="/pages/brands">Brands</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" href="/pages/about-us">About Us</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" href="/pages/contact-us">Contact Us</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" href="/pages/blog">Blogs</Link>
-            </li>
+          {/* Navbar links */}
+          <div className="collapse navbar-collapse" id="navbarNav">
+            <ul className="navbar-nav mx-auto">
+              <li className="nav-item"><Link className="nav-link active" href="/">Home</Link></li>
+              <li className="nav-item"><Link className="nav-link" href="/pages/shop">Shop</Link></li>
+              <li className="nav-item"><Link className="nav-link" href="/pages/brands">Brands</Link></li>
+              <li className="nav-item"><Link className="nav-link" href="/pages/about-us">About Us</Link></li>
+              <li className="nav-item"><Link className="nav-link" href="/pages/contact-us">Contact Us</Link></li>
+              <li className="nav-item"><Link className="nav-link" href="/pages/blog">Blogs</Link></li>
+            </ul>
 
-          </ul>
-
-          {/* Search Bar */}
-             <form className="d-flex me-2" onSubmit={handleSearch}>
-               <div className="input-group">
-                <input type="text" className="form-control" placeholder="Search products" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} aria-label="Search"/>
-                <button className="btn btn-secondary" type="submit">
-                  Search
-                </button>
+            {/* Search */}
+            <form className="d-flex me-2 position-relative" onSubmit={handleSearch}>
+              <div className="input-group">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Search products"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  aria-label="Search"
+                />
+                <button className="btn btn-secondary" type="submit">Search</button>
               </div>
+
+              {productSuggestions.length > 0 && (
+                <div className="search-suggestions bg-white shadow rounded position-absolute w-100 mt-1 p-2 z-10">
+                  {productSuggestions.map((product) => (
+                    <span
+                      key={product._id}
+                      className="badge bg-light text-dark me-2 mb-2 px-2 py-1 rounded-pill chip-suggestion cursor-pointer"
+                      onClick={() => handleSuggestionClick(product)}
+                    >
+                      {product.name}
+                    </span>
+                  ))}
+                </div>
+              )}
             </form>
 
-          {/* Icons */}
-          <div className="d-flex ms-1">
-            {/* <Link className="nav-link" href="/pages/signup">
-              <IoIosPersonAdd className="fs-3"/>
-            </Link> */}
-            <div className="float-end d-flex">
-            <Link className="nav-link position-relative" href="/pages/addtocart">
-                <FaShoppingCart className="fs-4 text-white" />
-                {cartItems.length > 0 && (
-                  <span className="position-absolute top-2 start-100 translate-middle badge rounded-pill bg-warning text-dark">
-                    {cartItems.length}
-                  </span>
-                )}
+            {/* Cart and Whatsapp */}
+            <div className="d-flex ms-1">
+              <div className="float-end d-flex">
+                <Link className="nav-link position-relative" href="/pages/addtocart">
+                  <FaShoppingCart className="fs-4 text-white" />
+                  {cartItems.length > 0 && (
+                    <span className="position-absolute top-2 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+                      {cartItems.length}
+                    </span>
+                  )}
+                </Link>
+              </div>
+              <Link className="nav-link ms-1" href="#">
+                <i className="bi bi-whatsapp text-white fs-4"></i>
               </Link>
-
             </div>
-            <Link className="nav-link ms-1" href="#">
-              <i className="bi bi-whatsapp text-white fs-4"></i>
-            </Link>
           </div>
         </div>
+      </nav>
+
+      {/* Floating WhatsApp and WeChat icons */}
+      <Link href="https://wa.me/918826477077" target="_blank">
+        <div className="whatsap-fix">
+          <FaWhatsapp className="fs-1" />
+        </div>
+      </Link>
+      <div className="wechat">
+        <AiFillWechat className="fs-1" />
       </div>
-    </nav>
-    
-       {/* <Link
-      href="https://wa.me/918826477077"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="fixed bottom-4 right-4 flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-lg hover:bg-green-100 transition-all duration-300 z-50"
-    >
-      <FaWhatsapp className="text-green-500 text-2xl" />
-      <span className="text-sm font-medium text-black">+91 88264 77077</span>
-    </Link> */}
-
-  <Link 
-  href="https://wa.me/918826477077"
-  target="_blank"
-  >
-     <div className="whatsap-fix">
-    <FaWhatsapp  className="fs-1  "/>
-    </div> 
-    </Link>
-    
-
-    <div className="wechat">
-    <AiFillWechat  className="fs-1  "/>
-    </div>
-
-</>
-
+    </>
   );
 };
 
 export default Navbar;
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 

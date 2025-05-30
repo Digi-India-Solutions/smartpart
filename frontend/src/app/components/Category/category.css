@@ -1,0 +1,5 @@
+.category-box:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    transform: scale(1.02);
+    transition: all 0.3s ease;
+}

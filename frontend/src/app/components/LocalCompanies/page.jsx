@@ -49,54 +49,10 @@ import subbrand38 from '@/app/assets/localcompany/logo8.png';
 import subbrand39 from '@/app/assets/localcompany/logo4.png';
 import Link from 'next/link';
 import { getData, serverURL } from '@/app/services/FetchNodeServices';
-
-
-
-const brands = [
-  { src: subbrand1, alt: 'Audi'   , name : " HYUNDAI XTEER  "     },
-  { src: subbrand2, alt: 'Honda'  , name : "  MANDO "     },
-  { src: subbrand3, alt: 'Hyundai'  , name : "  VALEO  "     },
-  { src: subbrand4, alt: 'Nissan'  , name : " SCHAEFFLER  "     },
-  { src: subbrand5, alt: 'Renault'  , name : "  WABCO   "     },
-  { src: subbrand6, alt: 'Scorpio'  , name : " BREMBO "     },
-  { src: subbrand7, alt: 'Toyota'  , name : " BOSCH  "    },
-  { src: subbrand8, alt: 'Jaguar'  , name : " DENSO "     },
-  { src: subbrand9, alt: 'Scorpio'  , name : " PIERBURG "     },
-  { src: subbrand10, alt: 'Scorpio'  , name : " FILTRON "     },
-  { src: subbrand11, alt: 'Scorpio'  , name : "  HI-Q SANGSIN "    },
-  { src: subbrand12, alt: 'Scorpio'  , name : "  DONALDSON   "     },
-  { src: subbrand13, alt: 'Scorpio'  , name : " DOOWON   "     },
-  { src: subbrand14, alt: 'Scorpio'  , name : " MAHLE   "     },
-  { src: subbrand15, alt: 'Scorpio'  , name : " LUMAX  "     },
-  { src: subbrand16, alt: 'Scorpio'  , name : "  BORGWARNE  "     },
-  { src: subbrand17, alt: 'Scorpio'  , name : " SUBROS "     },
-  { src: subbrand18, alt: 'Suzuki'  , name : " VICTOR REINZ "    },
-  { src: subbrand19, alt: 'Scorpio'  , name : " SKF  "     },
-
-  { src: subbrand20, alt: 'BMW'  , name : " OSRAM "     },
-  { src: subbrand21, alt: 'Scorpio'  , name : " PHILIPS "     },
-  { src: subbrand22, alt: 'Scorpio'  , name : "DELPHI "     },
-  { src: subbrand23, alt: 'Scorpio'  , name : " SACHS "     },
-  { src: subbrand24, alt: 'Scorpio'  , name : "  PHC VALEO"     },
-  { src: subbrand25, alt: 'Scorpio'  , name : "HENGST  "     },
-  { src: subbrand26, alt: 'Scorpio'  , name : " CONTINENTAL  "     },
-  { src: subbrand27, alt: 'Scorpio'  , name : "TRW    "     },
-  { src: subbrand28, alt: 'Scorpio'  , name : " GARRETT "     },
-  { src: subbrand29, alt: 'Scorpio'  , name : "HANON SYSTEMS   "     },
-  { src: subbrand30, alt: 'Scorpio'  , name : "  FAG  "     },
-  { src: subbrand31, alt: 'Scorpio'  , name : " LUK  "     },
-  { src: subbrand32, alt: 'Scorpio'  , name : "  KNORR BREMSE  "     },
-  { src: subbrand33, alt: 'Scorpio'  , name : "  MANN FILTER    "     },
-  { src: subbrand34, alt: 'Scorpio'  , name : " FLEETGUARD      "     },
-  { src: subbrand35, alt: 'Scorpio'  , name : " WIX FILTERS "     },
-  { src: subbrand36, alt: 'Scorpio'  , name : " FEBI BILSTEIN "     },
-  { src: subbrand37, alt: 'Scorpio'  , name : " ZF  "     },
-  { src: subbrand38, alt: 'Scorpio'  , name : "TEL   "     },
-  { src: subbrand39, alt: 'Scorpio'  , name : " NGK  "     },
-]
+import { useRouter } from 'next/navigation';
 
 const Brands = () => {
-
+const router = useRouter()
   const [brand, setBrand] = useState([])
   
     const fetchBrand = async () => {
@@ -114,6 +70,13 @@ const Brands = () => {
     }, [])
     const filterData = brand.filter((item) => item.brand_category_name === 'TOP AFTERMARKETS BRANDS'&& item?.status===1)
     console.log("FRONEND_DATA:-", filterData)
+    
+    const handleCategoryClick = (category) => {
+      router.push(
+        `/pages/all-products/${category?.id}?name=${category?.name}&title=brand`
+      );
+    };
+
   return (
     <>
       <section className="local-container">
@@ -122,7 +85,7 @@ const Brands = () => {
           <div className='row justify-content-center'>
             {filterData?.map((item, index) =>
               <div key={index} className="col-md-2 col-4 p-0">
-                <Link href={`/pages/all-products/${item?.id}`} className='text-decoration-none text-dark'>
+                <div onClick={() => handleCategoryClick(item)} className='text-decoration-none text-dark'>
                 <div className='local-item'>
                   <div className='d-flex justify-content-center'>
                   <Image className="brandimg" src={`${serverURL}/uploads/images/${item?.image}` || item?.image || `${serverURL}/${item?.image}`} width={100} height={100} alt={item?.name} />
@@ -131,7 +94,7 @@ const Brands = () => {
                     {item.name}
                   </p>
                 </div>
-                </Link>
+                </div>
               </div>
             )}
           </div>

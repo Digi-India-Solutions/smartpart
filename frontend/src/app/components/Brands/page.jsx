@@ -29,22 +29,10 @@ import brand21 from '@/app/assets/brands/jcb.png';
 import brand22 from '@/app/assets/brands/mg.png';
 import Link from 'next/link';
 import { getData, serverURL } from '@/app/services/FetchNodeServices';
-
-const brands = [
-  { src: brand1, alt: 'Audi' }, { src: brand2, alt: 'Honda' }, { src: brand3, alt: 'Hyundai' },
-  { src: brand4, alt: 'Nissan' }, { src: brand5, alt: 'Renault' }, { src: brand6, alt: 'Suzuki' },
-  { src: brand7, alt: 'Toyota' }, { src: brand8, alt: 'Chevrolet' }, { src: brand9, alt: 'BMW' },
-  { src: brand10, alt: 'Scorpio' }, { src: brand11, alt: 'Tata' }, { src: brand12, alt: 'Volkswagen' },
-  { src: brand13, alt: 'KIA' }, { src: brand14, alt: 'Ashok Layland' }, { src: brand15, alt: 'Skoda' },
-  { src: brand16, alt: 'Jeep' }, { src: brand17, alt: 'Ford' }, { src: brand18, alt: 'Flat' },
-  { src: brand19, alt: 'Man' }, { src: brand20, alt: 'Mercedise' }, { src: brand21, alt: 'jcb' },
-  { src: brand22, alt: 'Man' },
-];
-
-
-
+import { useRouter } from 'next/navigation';
 const Brands = () => {
   const [brand, setBrand] = useState([])
+  const router = useRouter();
 
   const fetchBrand = async () => {
     //   try {
@@ -63,6 +51,13 @@ const Brands = () => {
 
   const filterData = brand.filter((item) => item.brand_category_name === 'Top OEM Brands' && item?.status === 1)
   console.log("FRONEND_DATA:-", filterData)
+
+  const handleCategoryClick = (category) => {
+    router.push(
+      `/pages/all-products/${category?.id}?name=${category?.name}&title=brand`
+    );
+  };
+
   return (
     <>
       <section className="brands-container py-3">
@@ -71,7 +66,7 @@ const Brands = () => {
           <div className='row justify-content-center'>
             {filterData.map((item, index) =>
               <div key={index} className="col-md-2 col-4 p-0">
-                <Link href={`/pages/all-products/${item?.id}`} className="text-decoration-none text-dark">
+                <div onClick={() => handleCategoryClick(item)} className="text-decoration-none text-dark">
                   <div className='brand-item'>
                     <div className='d-flex justify-content-center'>
                       <Image className="brandimg" src={`${serverURL}/uploads/images/${item?.image}` || item?.image || `${serverURL}/${item?.image}`} width={100} height={100} alt={item?.name} />
@@ -80,7 +75,7 @@ const Brands = () => {
                       {item?.name}
                     </p>
                   </div>
-                </Link>
+                </div>
               </div>
             )}
 

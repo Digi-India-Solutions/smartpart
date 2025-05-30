@@ -99,10 +99,10 @@ const ProductCard = ({ image, name, product_description, part_no, id }) => {
       </div>
       <div className="Shopproduct-info">
         <h3>{name}</h3>
-        <p className="shopproduct-details">{HtmlRenderer(product_description)}</p>
-        <p className="shopproduct-part">
+        <div className="shopproduct-details">{HtmlRenderer(product_description)}</div>
+        <div className="shopproduct-part">
           <strong>Part Number:</strong> {part_no}
-        </p>
+        </div>
         <div className="shopproduct-actions">
           <Link href={`/pages/details-page/${id}`} passHref>
             <button className="btn btn-primary">SHOP NOW</button>
@@ -119,6 +119,8 @@ const ShopPage = () => {
   const [brandCategory, setBrandCategory] = useState([]);
   const [allBrand, setAllBrand] = useState([]);
   const [category, setCategory] = useState([]);
+  const [filterAllBrand, setFilterAllBrand] = useState([]);
+  const [filterCategory, setFilterCategory] = useState([]);
 
   // Selected filters
   const [selectedBrandCategory, setSelectedBrandCategory] = useState([]);
@@ -152,6 +154,23 @@ const ShopPage = () => {
     fetchData("category/get-all-categorys", setCategory, "Failed to load categories");
   }, []);
 
+  useEffect(() => {
+    setFilterAllBrand(selectedBrandCategory?.map((item) => allBrand?.filter((b) => b?.brand_cat_id === item)))
+
+    const brandCatIds = selectedBrands
+      .map((item) => allBrand?.find((b) => b?.id === item)?.cat_id)
+      .filter(Boolean).flatMap((str) => str.split(','));
+
+    const matchedCategories = brandCatIds
+      .flatMap((item) => item.split(','))
+      .map((id) => parseInt(id))
+      .map((id) => category.find((b) => b.id === id))
+      .filter(Boolean);
+
+    setFilterCategory(matchedCategories)
+
+  }, [allBrand, selectedBrandCategory, selectedBrands])
+
   // Build filter query string
   const buildFilterQuery = (filters) => {
     const queryParts = [];
@@ -164,9 +183,7 @@ const ShopPage = () => {
   // Fetch products with filters, search and pagination
   const fetchProducts = useCallback(
     async (search = searchTerm, page = currentPage, filters = {
-      brandCategory: selectedBrandCategory,
-      brand: selectedBrands,
-      category: selectedCategories,
+      brandCategory: selectedBrandCategory, brand: selectedBrands, category: selectedCategories,
     }) => {
       setLoading(true);
       try {
@@ -176,7 +193,7 @@ const ShopPage = () => {
             ? `product/search-product?page=${page}&limit=${itemsPerPage}&search=${encodeURIComponent(search)}${filterQuery}`
             : `product/get-all-product?page=${page}&limit=${itemsPerPage}&search=${search}`
         );
-        if (res.status) {
+        if (res?.status) {
           setProducts(res.data || []);
           setTotalPages(res.totalPages || 1);
         } else {
@@ -189,9 +206,7 @@ const ShopPage = () => {
         setLoading(false);
       }
     },
-    [searchTerm, currentPage,
-      selectedBrandCategory,
-      selectedBrands, selectedCategories]
+    [searchTerm, currentPage, selectedBrandCategory, selectedBrands, selectedCategories]
   );
 
   // Fetch products when filters, page or search change
@@ -220,22 +235,28 @@ const ShopPage = () => {
 
   // Toggle handler for filters
   const handleToggle = (filterType, id) => {
-    const updateSelected = (selected, setSelected) =>
-      selected.includes(id) ? selected.filter((item) => item !== id) : [...selected, id];
+    const toggleSingleSelect = (selected, setSelected) => {
+      if (selected[0] === id) {
+        setSelected([]); // Deselect if already selected
+      } else {
+        setSelected([id]); // Only one selected at a time
+      }
+    };
 
     switch (filterType) {
       case "brandCategory":
-        setSelectedBrandCategory((prev) => updateSelected(prev, setSelectedBrandCategory));
+        toggleSingleSelect(selectedBrandCategory, setSelectedBrandCategory);
         break;
       case "brand":
-        setSelectedBrands((prev) => updateSelected(prev, setSelectedBrands));
+        toggleSingleSelect(selectedBrands, setSelectedBrands);
         break;
       case "category":
-        setSelectedCategories((prev) => updateSelected(prev, setSelectedCategories));
+        toggleSingleSelect(selectedCategories, setSelectedCategories);
         break;
       default:
         break;
     }
+
     setCurrentPage(1);
   };
 
@@ -273,14 +294,14 @@ const ShopPage = () => {
               />
               <FilterSection
                 title="Brand"
-                items={allBrand}
+                items={filterAllBrand[0]}
                 selectedIds={selectedBrands}
                 onToggle={(id) => handleToggle("brand", id)}
                 defaultOpen={false}
               />
               <FilterSection
                 title="Category"
-                items={category}
+                items={filterCategory}
                 selectedIds={selectedCategories}
                 onToggle={(id) => handleToggle("category", id)}
                 defaultOpen={false}

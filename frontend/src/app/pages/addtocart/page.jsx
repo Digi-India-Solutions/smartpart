@@ -354,7 +354,7 @@ const Page = () => {
                         <b>{item?.product?.name}</b>
                         <p>Part Number: {item?.product?.part_no}</p>
                         <p>Brand: {item?.product?.brand_name}</p>
-                        <p>Qty: {item?.quantity}</p>
+                        {/* <p>Qty: {item?.quantity}</p>
                         <div className="d-flex justify-content-center gap-2">
                           <button
                             className="btn btn-sm btn-secondary"
@@ -368,7 +368,7 @@ const Page = () => {
                           >
                             +
                           </button>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
 
@@ -397,7 +397,7 @@ const Page = () => {
               Looking for the best price? Get an exclusive quote today and
               secure the best deal. Click "Enquire Now".
             </h5>
-            <h6 className="text-light">Total: ₹{totalPrice.toLocaleString()}</h6>
+            {/* <h6 className="text-light">Total: ₹{totalPrice.toLocaleString()}</h6> */}
             <button className="btn btn-warning" onClick={() => setShowModal(true)}>
               Enquire Now
             </button>

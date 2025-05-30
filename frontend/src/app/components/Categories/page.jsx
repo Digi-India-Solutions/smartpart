@@ -40,7 +40,7 @@ const Page = () => {
               return (
                 <div key={index} className="col-md-2 col-6">
                   <div className='categoriesPortion'>
-                    <Link href="/pages/shop" className="text-decoration-none text-dark">
+                    <Link href="/pages/all-category" className="text-decoration-none text-dark">
                       <div className='icon'>
                         <Image
                           className="brandimg"

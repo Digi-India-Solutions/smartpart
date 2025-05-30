@@ -84,6 +84,11 @@ const page = () => {
   const filterData2 = brand.filter((item) => item?.brand_category_name === '2/3 WHEELERS AFTERMARKET BRANDS' && item?.status===1)
   console.log("FRONEND_DATA:-", filterData2)
 
+  const handleCategoryClick = (category) => {
+    router.push(
+      `/pages/all-products/${category?.id}?name=${category?.name}&title=brand`
+    );
+  };
   
   return (
     <>
@@ -96,7 +101,7 @@ const page = () => {
           <div className='row justify-content-center'>
             {filterData?.map((item, index) =>
               <div key={index} className="col-md-2 col-4 p-0">
-                <Link href={`/pages/all-products/${item?.id}`} className='text-decoration-none text-dark'>
+                <div onClick={()=>handleCategoryClick(item)}  className='text-decoration-none text-dark'>
                 <div className='Wheel-item'>
                   <div className='d-flex justify-content-center'>
                    <Image className="brandimg" src={`${serverURL}/uploads/images/${item?.image}` || item?.image || `${serverURL}/${item?.image}`} width={100} height={100} alt={item?.name} />
@@ -105,7 +110,7 @@ const page = () => {
                     {item.name}
                   </p>
                 </div>
-                </Link>
+                </div>
               </div>
             )}
           </div>

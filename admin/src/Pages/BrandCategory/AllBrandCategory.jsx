@@ -63,9 +63,9 @@ const AllBrandCategory = () => {
             <ToastContainer />
             <div className="bread d-flex justify-content-between align-items-center mb-3">
                 <h4>All Brand Categories</h4>
-                <Link to="/add-brand-category" className="btn btn-primary">
+                {/* <Link to="/add-brand-category" className="btn btn-primary">
                     Add New <i className="fa-solid fa-plus"></i>
-                </Link>
+                </Link> */}
             </div>
 
             <section className="table-responsive">
@@ -77,8 +77,8 @@ const AllBrandCategory = () => {
                             <th>Image</th>
                             <th>Show on Home</th>
                             <th>Status</th>
-                            <th>Edit</th>
-                            <th>Delete</th>
+                            {/* <th>Edit</th>
+                            <th>Delete</th> */}
                         </tr>
                     </thead>
                     <tbody>
@@ -114,19 +114,19 @@ const AllBrandCategory = () => {
                                             {item?.status === 1 ? 'Active' : 'Inactive'}
                                         </button>
                                     </td>
-                                    <td>
+                                    {/* <td>
                                         <Link to={`/edit-brand-category/${item?.id}`} className="btn btn-warning btn-sm">
                                             Edit
                                         </Link>
-                                    </td>
-                                    <td>
+                                    </td> */}
+                                    {/* <td>
                                         <button
                                             className="btn btn-danger btn-sm"
                                             onClick={() => handleDelete(item?.id)}
                                         >
                                             Delete
                                         </button>
-                                    </td>
+                                    </td> */}
                                 </tr>
                             ))
                         ) : (

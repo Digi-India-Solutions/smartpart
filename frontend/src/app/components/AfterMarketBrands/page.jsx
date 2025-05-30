@@ -11,22 +11,12 @@ import './aftermarketbrand.css'
 import SpiningWheel from  '@/app/components/SpiningWheel/page'
 import Link from 'next/link';
 import { getData, serverURL } from '@/app/services/FetchNodeServices';
-
-const subbrands = [
-  { src: img7, alt: 'ventage', name : " MICHELIN " },
-  { src: img2, alt: 'ventage', name : " MRF " },
-  { src: img3, alt: 'ventage', name : " GOODYEAR " },
-  { src: img4, alt: 'ventage', name : " FEAT " },
-  { src: img5, alt: 'ventage', name : " BRIDGESTON " },
-  { src: img6, alt: 'ventage', name : " APOLLO" },
-  
-  
-];
+import { useRouter } from 'next/navigation';
 
 
 const Brands = () => {
    const [brand, setBrand] = useState([])
-  
+  const router = useRouter();
     const fetchBrand = async () => {
       const res = await getData("brand/get-all-brand");
       console.log("Brand Data:", res?.data);
@@ -41,6 +31,12 @@ const Brands = () => {
     const filterData = brand.filter((item) => item?.brand_category_name === 'TYRES 2W/3W/4W/LCV/HCV' && item?.status===1)
     console.log("FRONEND_DATA:-", filterData)
   
+    const handleCategoryClick = (category) => {
+      router.push(
+        `/pages/all-products/${category?.id}?name=${category?.name}&title=brand`
+      );
+    };
+
   return (
     <>
      <SpiningWheel/>
@@ -50,7 +46,7 @@ const Brands = () => {
           <div className='row justify-content-center'>
             {filterData.map((item, index) =>
               <div key={index} className="col-md-2 col-4 p-0">
-                <Link href={`/pages/all-products/${item?.id}`} className='text-decoration-none text-dark'>
+                <div onClick={() => handleCategoryClick(item)} className='text-decoration-none text-dark'>
                 <div className='aftermarketbrands-item'>
                   <div className='d-flex justify-content-center'>
                   <Image className="brandimg" src={`${serverURL}/uploads/images/${item?.image}` || item?.image || `${serverURL}/${item?.image}`} width={100} height={100} alt={item?.name} />
@@ -59,7 +55,7 @@ const Brands = () => {
                     {item.name}
                   </p>
                 </div>
-                </Link>
+                </div>
               </div>
             )}
           </div>

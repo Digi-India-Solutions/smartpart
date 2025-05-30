@@ -2,88 +2,33 @@ const catchAsyncErrors = require('../../middleware/catchAsyncErrors');
 const fs = require('fs');
 const path = require('path');
 const pool = require('../../db/pool');
-// const { error } = require('../../uploads/images');
-
-// exports.createBrand = catchAsyncErrors(async (req, res) => {
-//     try {
-//         const {
-//             brand_cat_id, name, seo_url, meta_title, meta_description,
-//             meta_keyword, top_title, top_des, b_des, status
-//         } = req.body;
-
-//         if (!name) {
-//             return res.status(400).json({ status: false, message: 'Brand name is required' });
-//         }
-
-//         const image = req.file || null;
-//         const imagePath = image ? image.filename : null;
-
-//         const banner = req.file || null;
-//         const bannerPath = banner ? banner.filename : null;
-
-//         const sql = `
-//             INSERT INTO cyb_brands (
-//                 brand_cat_id, name, image, seo_url, meta_title,banner,
-//                 meta_description, meta_keyword, top_title, top_des, b_des, status
-//             )
-//             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-//         `;
-
-//         const values = [
-//             JSON.parse(brand_cat_id) || null,
-//             name,
-//             imagePath,
-//             bannerPath,
-//             seo_url || null,
-//             meta_title || null,
-//             meta_description || null,
-//             meta_keyword || null,
-//             top_title || null,
-//             top_des || null,
-//             b_des || null,
-//             status ? 1 : 0
-//         ];
-
-//         await pool.query(sql, values, (error, results) => {
-//             if (error) {
-//                 console.log("error", error)
-//                 return res.status(401).json({ status: false, message: error.sqlMessage });
-//             } else {
-//                 return res.status(201).json({ status: true, message: 'Brand created successfully' });
-//             }
-//         });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ status: false, message: 'Server Error', error: error.message });
-//     }
-// });
 
 exports.createBrand = catchAsyncErrors(async (req, res) => {
     try {
         const {
             brand_cat_id, name, seo_url, meta_title, meta_description,
-            meta_keyword, top_title, top_des, b_des, status, cat_id,
+            meta_keyword, top_title, top_des, b_des, status, cat_ids,
         } = req.body;
 
         console.log("cat_id:--", req.body)
-        // Validation
+
         if (!name || !brand_cat_id) {
             return res.status(400).json({ status: false, message: 'Brand name and category are required' });
         }
 
-        // File handling
         const image = req.files?.image?.[0] || null;
         const banner = req.files?.banner?.[0] || null;
 
         const imagePath = image ? image.filename : null;
         const bannerPath = banner ? banner.filename : null;
 
+        const catIdStr = Array.isArray(cat_ids) ? cat_ids.join(',') : '';
         const sql = `
             INSERT INTO cyb_brands (
-                brand_cat_id, name, image, banner,cat_id, seo_url, meta_title,
+                brand_cat_id, name, image, banner, cat_id, seo_url, meta_title,
                 meta_description, meta_keyword, top_title, top_des, b_des, status
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         const values = [
@@ -91,7 +36,7 @@ exports.createBrand = catchAsyncErrors(async (req, res) => {
             name,
             imagePath,
             bannerPath,
-            JSON.parse(cat_id),
+            catIdStr,
             seo_url || null,
             meta_title || null,
             meta_description || null,
@@ -152,114 +97,88 @@ exports.getAllBrandById = catchAsyncErrors(async (req, res) => {
 })
 
 exports.updateBrand = catchAsyncErrors(async (req, res) => {
-    const { id } = req.params;
-    const {
-        brand_cat_id, cat_id, name, seo_url, meta_title,
-        meta_description, meta_keyword, top_title,
-        top_des, b_des, status
-    } = req.body;
+    try {
+        const { id } = req.params;
 
-    const newImage = req.files?.image?.[0]?.filename || null;
-    const newBanner = req.files?.banner?.[0]?.filename || null;
+        const {
+            brand_cat_id, cat_ids, name, seo_url, meta_title,
+            meta_description, meta_keyword, top_title, top_des, b_des, status
+        } = req.body;
 
-    // Step 1: Get existing brand to delete old image/banner if needed
-    pool.query('SELECT image, banner FROM cyb_brands WHERE id = ?', [id], (err, results) => {
-        if (err) {
-            console.error('Database error:', err);
-            return res.status(500).json({ status: false, message: 'Internal server error' });
+        if (!id || !name || !brand_cat_id) {
+            return res.status(400).json({ status: false, message: 'ID, Brand name, and category are required' });
         }
 
-        if (!results.length) {
-            return res.status(404).json({ status: false, message: 'Brand not found' });
-        }
+        const image = req.files?.image?.[0] || null;
+        const banner = req.files?.banner?.[0] || null;
 
-        const existing = results[0];
+        const newImage = image ? image.filename : null;
+        const newBanner = banner ? banner.filename : null;
 
-        // Step 2: Delete old image if a new image was uploaded
-        if (newImage && existing.image) {
-            const oldImagePath = path.join(__dirname, '../../uploads/images', existing.image);
-            if (fs.existsSync(oldImagePath)) {
-                fs.unlinkSync(oldImagePath);
-                console.log('Deleted old image:', oldImagePath);
-            }
-        }
-
-        // Step 3: Delete old banner if a new banner was uploaded
-        if (newBanner && existing.banner) {
-            const oldBannerPath = path.join(__dirname, '../../uploads/images', existing.banner);
-            if (fs.existsSync(oldBannerPath)) {
-                fs.unlinkSync(oldBannerPath);
-                console.log('Deleted old banner:', oldBannerPath);
-            }
-        }
-
-        // Step 4: Update brand with new values
-        const sql = `
-            UPDATE cyb_brands SET
-                brand_cat_id = ?,
-                cat_id = ?,
-                name = ?,
-                image = COALESCE(?, image),
-                banner = COALESCE(?, banner),
-                seo_url = ?,
-                meta_title = ?,
-                meta_description = ?,
-                meta_keyword = ?,
-                top_title = ?,
-                top_des = ?,
-                b_des = ?,
-                status = ?
-            WHERE id = ?
-        `;
-
-        const values = [
-            brand_cat_id || null,
-            cat_id || null,
-            name,
-            newImage,
-            newBanner,
-            seo_url || null,
-            meta_title || null,
-            meta_description || null,
-            meta_keyword || null,
-            top_title || null,
-            top_des || null,
-            b_des || null,
-            status === "true" || status === true ? 1 : 0,
-            id
-        ];
-
-        pool.query(sql, values, (updateErr, updateResult) => {
-            if (updateErr) {
-                console.error('Update error:', updateErr);
-                return res.status(500).json({ status: false, message: 'Failed to update brand' });
+        // Get existing image & banner to remove if new ones are uploaded
+        pool.query('SELECT image, banner FROM cyb_brands WHERE id = ?', [id], (err, results) => {
+            if (err) {
+                console.error('Database error:', err);
+                return res.status(500).json({ status: false, message: 'Internal server error' });
             }
 
-            return res.status(200).json({ status: true, message: 'Brand updated successfully' });
+            if (!results.length) {
+                return res.status(404).json({ status: false, message: 'Brand not found' });
+            }
+
+            const existing = results[0];
+
+            // Delete old image if a new one is uploaded
+            if (newImage && existing.image) {
+                const oldImagePath = path.join(__dirname, '../../uploads/images', existing.image);
+                if (fs.existsSync(oldImagePath)) {
+                    fs.unlinkSync(oldImagePath);
+                }
+            }
+
+            // Delete old banner if a new one is uploaded
+            if (newBanner && existing.banner) {
+                const oldBannerPath = path.join(__dirname, '../../uploads/images', existing.banner);
+                if (fs.existsSync(oldBannerPath)) {
+                    fs.unlinkSync(oldBannerPath);
+                }
+            }
+
+            // Convert cat_ids to comma-separated string
+            const catIdStr = Array.isArray(cat_ids)
+                ? cat_ids.join(',')
+                : typeof cat_ids === "string"
+                    ? cat_ids
+                    : '';
+
+            const sql = `
+                UPDATE cyb_brands SET
+                    brand_cat_id = ?,name = ?,image = COALESCE(?, image),banner = COALESCE(?, banner), cat_id = ?,                    seo_url = ?,
+                    meta_title = ?, meta_description = ?, meta_keyword = ?, top_title = ?,
+                    top_des = ?, b_des = ?, status = ? WHERE id = ?
+            `;
+
+            const values = [
+                brand_cat_id, name, newImage, newBanner, catIdStr, seo_url || null, meta_title || null,
+                meta_description || null, meta_keyword || null, top_title || null, top_des || null, b_des || null,
+                status === "true" || status === true ? 1 : 0,
+                id
+            ];
+
+            pool.query(sql, values, (updateErr, updateResult) => {
+                if (updateErr) {
+                    console.error('Update error:', updateErr);
+                    return res.status(500).json({ status: false, message: 'Failed to update brand' });
+                }
+
+                return res.status(200).json({ status: true, message: 'Brand updated successfully' });
+            });
         });
-    });
+    } catch (error) {
+        console.error("Server error:", error);
+        res.status(500).json({ status: false, message: 'Internal Server Error', error: error.message });
+    }
 });
-
-// exports.deleteBrand = catchAsyncErrors(async (req, res) => {
-
-//     const { id } = req.params;
-
-//     pool.query('SELECT image FROM cyb_brands WHERE id = ?', [id], (err, result) => {
-//         if (err) return res.status(500).json({ status: false, message: err.message });
-
-//         const oldImage = result[0]?.image;
-//         if (oldImage) {
-//             const imagePath = path.join(__dirname, '../../uploads/images', oldImage);
-//             if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
-//         }
-
-//         pool.query('DELETE FROM cyb_brands WHERE id = ?', [id], (error, results) => {
-//             if (error) return res.status(500).json({ status: false, message: error.message });
-
-//             res.status(200).json({ status: true, message: 'Brand deleted successfully' });
-//         });
-//     });
-// });
 
 exports.deleteBrand = catchAsyncErrors(async (req, res) => {
     const { id } = req.params;
