@@ -1,3 +1,5 @@
+"use client"
+
 import "./footer.css";
 import { FaTwitter, FaGithub, FaLinkedin } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";

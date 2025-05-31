@@ -96,7 +96,7 @@ export default function BlogPage() {
   };
 
   useEffect(() => {
-    fetchBlogs(page);
+    fetchBlogs(1);
   }, []);
 
   return (

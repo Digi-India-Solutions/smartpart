@@ -23,7 +23,7 @@ const Brands = () => {
     fetchBrand();
   }, []);
 
-  const filterData = brand.filter(
+  const filterData = brand?.filter(
     (item) => item?.brand_category_name === 'LUBRICANT BRANDS' && item?.status === 1
   );
   console.log("FRONTEND_DATA:-", filterData);
@@ -63,62 +63,3 @@ const Brands = () => {
 };
 
 export default Brands;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import Image from 'next/image';
-// import React from 'react';
-// import pic1 from '@/app/assets/icons/lubricant1.png';
-// import pic2 from '@/app/assets/icons/lubricant2.png';
-// import pic3 from '@/app/assets/icons/lubricant3.png';
-// import pic4 from '@/app/assets/icons/lubricant4.png';
-
-// import './lubricant.css';
-
-// const subbrands = [
-//   { src: pic1, alt: 'ventage', name: 'ventange' },
-//   { src: pic2, alt: 'ventage', name: 'ventange' },
-//   { src: pic3, alt: 'ventage', name: 'ventange' },
-//   { src: pic4, alt: 'ventage', name: 'ventange' },
-
- 
-// ];
-
-// const Page = () => {
-//   return (
-//     <section className='lubricantsection bg-black py-10'>
-//       <div className="container mx-auto px-4">
-//         <h2 className='lubricanttitle text-2xl md:text-3xl font-bold mb-6'>
-//           <span className='text-warning'>Lubricant</span>
-//         </h2>
-        
-//         <div className='lubricantsec'>
-//           {subbrands.map((item, index) => (
-//             <div 
-//               key={index} 
-//               className='lubricantbrand'
-//             >
-//               <Image className='lubricantbrandImg' src={item.src} alt={item.alt} />
-            
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-//     </section>
-//   );
-// };
-
-// export default Page;

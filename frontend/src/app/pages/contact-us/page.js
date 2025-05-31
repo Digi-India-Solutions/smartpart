@@ -61,7 +61,7 @@ const Page = () => {
 
           <div className='col-md-6'>
             {/* Use <img> instead of <iframe> for GIFs */}
-            <img src={gif.src} height={480} alt="GIF Animation" width="100%" />
+            <Image src={gif.src} height={480} alt="GIF Animation" width="100%" />
           </div>
 
           <div className='col-md-6 '>

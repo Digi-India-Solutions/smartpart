@@ -46,7 +46,7 @@ const page = () => {
       <Wheels />
       {/* <AnimatedPic/> */}
       <AfterMarketBrands />
-      <Lubricant /> //
+      <Lubricant /> 
       <Trands />
       <Categroies />
       <FigureOut />
