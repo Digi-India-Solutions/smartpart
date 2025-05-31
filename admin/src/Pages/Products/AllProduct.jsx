@@ -110,7 +110,7 @@
 //                     href={
 //                       item.image1?.includes("cloudinary")
 //                         ? item.image1
-//                         : `http://localhost:8000/${item.image1}`
+//                         : `https://api.maasavitrinursingcollege.com/${item.image1}`
 //                     }
 //                     target="_blank"
 //                     rel="noopener noreferrer"
@@ -119,7 +119,7 @@
 //                       src={
 //                         item.image1?.includes("cloudinary")
 //                           ? item.image1
-//                           : `http://localhost:8000/${item.image1}`
+//                           : `https://api.maasavitrinursingcollege.com/${item.image1}`
 //                       }
 //                       alt=""
 //                       style={{ height: 50 }}
@@ -131,7 +131,7 @@
 //                     href={
 //                       item.image2?.includes("cloudinary")
 //                         ? item.image2
-//                         : `http://localhost:8000/${item.image2}`
+//                         : `https://api.maasavitrinursingcollege.com/${item.image2}`
 //                     }
 //                     target="_blank"
 //                     rel="noopener noreferrer"
@@ -140,7 +140,7 @@
 //                       src={
 //                         item.image2?.includes("cloudinary")
 //                           ? item.image2
-//                           : `http://localhost:8000/${item.image2}`
+//                           : `https://api.maasavitrinursingcollege.com/${item.image2}`
 //                       }
 //                       alt=""
 //                       style={{ height: 50 }}

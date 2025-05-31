@@ -20,7 +20,7 @@ const EditVoucher = () => {
     useEffect(() => {
         const fetchVoucher = async () => {
             try {
-                const response = await axios.get(`http://localhost:8000/api/new-lanch/${id}`);
+                const response = await axios.get(`https://api.maasavitrinursingcollege.com/api/new-lanch/${id}`);
                 const { productName, active, image } = response.data;
                 setFormData({ productName, active });
                 setFile(image); // You can set the existing image here if needed

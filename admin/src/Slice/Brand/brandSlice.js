@@ -45,7 +45,7 @@ export const updateBrandCategory = createAsyncThunk('brandCategory/update', asyn
 
 export const deleteBrandCategory = createAsyncThunk('brandCategory/delete', async (id, { rejectWithValue }) => {
     try {
-        const response = await axios.delete(`http://localhost:8000/api/brand-category/${id}`);
+        const response = await axios.delete(`https://api.maasavitrinursingcollege.com/api/brand-category/${id}`);
         return { id, status: response.status };
     } catch (error) {
         return rejectWithValue(error.response?.data || "Failed to delete brand category");
