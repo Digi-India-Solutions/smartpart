@@ -42,27 +42,13 @@ const Login = () => {
 
           <div className="form-group">
             <label>Password</label>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              className="form-control"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="Enter password"
-            />
+            <input  type={showPassword ? 'text' : 'password'} className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} required   placeholder="Enter password"/>
             <div className="show-password">
-              <input
-                type="checkbox"
-                checked={showPassword}
-                onChange={() => setShowPassword(!showPassword)}
-                id="show-password-checkbox"
-              />
+              <input type="checkbox" checked={showPassword} onChange={() => setShowPassword(!showPassword)} id="show-password-checkbox"/>
               <label htmlFor="show-password-checkbox">Show Password</label>
             </div>
           </div>
-          <button type="submit" className="login-button">
-          Login
-          </button>
+          <button type="submit" className="login-button"> Login </button>
         </form>
 {/* 
         <a href="#" className="forgot-password">Forgot Password?</a> */}

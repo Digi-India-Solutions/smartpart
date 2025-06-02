@@ -505,7 +505,7 @@ const Page = ({ id }) => {
 
     // Products & pagination states
     const [products, setProducts] = useState([]);
-    const [searchTerm, setSearchTerm] = useState("");
+    const [searchTerm, setSearchTerm] = useState(id || "");
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -590,6 +590,7 @@ const Page = ({ id }) => {
             setLoading(true);
             try {
                 const filterQuery = buildFilterQuery(filters);
+                console.log("VfilterQuery:=>", filterQuery)
                 const res = await getData(
                     filterQuery
                         ? `product/search-product?page=${page}&limit=${itemsPerPage}&search=${encodeURIComponent(search)}${filterQuery}`

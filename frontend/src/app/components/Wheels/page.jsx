@@ -27,6 +27,7 @@ import img6 from '@/app/assets/icons/hero.webp'
 import img7 from '@/app/assets/Wheelers/ashok layland.png'
 import img8 from '@/app/assets/Wheelers/piaggio.png'
 import { getData, serverURL } from '@/app/services/FetchNodeServices';
+import { useRouter } from 'next/navigation';
 // import VideoSection from '../Videosec/page';
 
 // import SpiningWheel from '@/app/components/SpiningWheel/page'
@@ -64,7 +65,7 @@ const subbrands = [
 
 const page = () => {
   const [brand, setBrand] = useState([])
-
+const router = useRouter()
   const fetchBrand = async () => {
     //   try {
     const res = await getData("brand/get-all-brand");
