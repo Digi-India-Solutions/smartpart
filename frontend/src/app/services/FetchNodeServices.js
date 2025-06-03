@@ -6,9 +6,7 @@ const serverURL = "https://api.maasavitrinursingcollege.com";
 const postData = async (url, body) => {
   try {
     console.log(JSON.stringify(body));
-
     var response = await axios.post(`${serverURL}/api/${url}`, body);
-
     var data = response.data;
     return data;
   } catch (e) {

@@ -296,8 +296,7 @@ import "intl-tel-input/build/css/intlTelInput.css";
 import "sweetalert2/dist/sweetalert2.min.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
-
-import pic1 from "@/app/assets/products/item1.jpg";
+import pic1 from "@/app/assets/productItem.jpg";
 import brandpic from "@/app/assets/brands/suzuki.png";
 import { getData, postData, serverURL } from "@/app/services/FetchNodeServices";
 import "./productdetails.css";
@@ -411,7 +410,13 @@ const ProductDetail = () => {
         <div className="Detail-product-wrapper">
           <div className="Detail-product-image">
             <Image
-              src={product?.image ? `${serverURL}/uploads/images/${product.image}` : pic1}
+              src={
+                product?.image && typeof product.image === "string"
+                  ? product.image.startsWith("uploads/product")
+                    ? `${serverURL}/uploads/product/${product?.image}`
+                    : `${serverURL}/uploads/images/${product?.image}`
+                  : pic1
+              }
               alt={product?.name || "Product"}
               width={400}
               height={400}
@@ -423,7 +428,7 @@ const ProductDetail = () => {
             <p>Free Delivery (Dispatch within 1 Day)</p>
 
             <Image
-              src={product?.brand_image ? `${serverURL}/uploads/images/${product.brand_image}` : brandpic}
+              src={product?.brand_image ? `${serverURL}/uploads/images/${product?.brand_image}` : brandpic}
               width={50}
               height={50}
               alt="Brand"

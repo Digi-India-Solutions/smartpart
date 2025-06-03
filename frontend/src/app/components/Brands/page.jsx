@@ -58,6 +58,10 @@ const Brands = () => {
     );
   };
 
+  // const imageSrc = filterData?.image?.startsWith('uploads/images')
+  // ? `${serverURL}/${filterData?.image}`
+  // : `${serverURL}/uploads/images/${filterData?.image}`;
+
   return (
     <>
       <section className="brands-container py-3">
@@ -69,7 +73,16 @@ const Brands = () => {
                 <div onClick={() => handleCategoryClick(item)} className="text-decoration-none text-dark">
                   <div className='brand-item'>
                     <div className='d-flex justify-content-center'>
-                      <Image className="brandimg" src={`${serverURL}/uploads/images/${item?.image}` || item?.image || `${serverURL}/${item?.image}`} width={100} height={100} alt={item?.name} />
+                      <Image
+                        src={
+                          item?.image
+                            ? (item?.image?.includes('uploads/images')
+                              ? `${serverURL}/${item?.image}`
+                              : `${serverURL}/uploads/images/${item?.image}`)
+                            : '/default-category.png'
+                        }
+                        width={100} height={100}
+                        alt={item?.name || 'Brand Image'} style={{ objectFit: 'contain' }} />
                     </div>
                     <p className='text-center'>
                       {item?.name}

@@ -12,6 +12,7 @@ const AllProductEnquiry = () => {
     const fetchEnquiries = async () => {
         try {
             const res = await getData("cardEnquiry/get-all-card-enquiry");
+            console.log("/get-all-card-enquiry",res)
             if (res?.status) {
                 setData(res.data || []);
             } else {

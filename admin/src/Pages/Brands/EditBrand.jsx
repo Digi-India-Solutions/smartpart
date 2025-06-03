@@ -252,7 +252,6 @@
 
 // export default EditBrand;
 
-
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
@@ -286,31 +285,9 @@ const EditBrand = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        if (id) fetchSingleBrand();
         fetchData();
+        if (id) fetchSingleBrand();
     }, [id]);
-
-    const fetchSingleBrand = async () => {
-        try {
-            const res = await getData(`brand/get-all-brand-by-id/${id}`);
-            if (res.status && res.data) {
-                const data = res.data;
-
-                setFormData({
-                    brand_cat_id: data.brand_cat_id || '', name: data.name || '', seo_url: data.seo_url || '', meta_title: data.meta_title || '',
-                    meta_description: data.meta_description || '', meta_keyword: data.meta_keyword || '', top_title: data.top_title || '',
-                    top_des: data.top_des || '', b_des: data.b_des || '', status: data.status || false,
-                    cat_ids: data?.cat_id.split(",").map(id => id.trim()), // ensure array
-                });
-                if (data.image) setImagePreview(`${serverURL}/uploads/images/${data.image}`);
-                if (data.banner) setBannerPreview(`${serverURL}/uploads/images/${data.banner}`);
-            } else {
-                toast.error("Brand not found");
-            }
-        } catch (err) {
-            toast.error("Failed to load brand data");
-        }
-    };
 
     const fetchData = async () => {
         try {
@@ -325,6 +302,40 @@ const EditBrand = () => {
         }
     };
 
+    const fetchSingleBrand = async () => {
+        try {
+            const res = await getData(`brand/get-all-brand-by-id/${id}`);
+            if (res.status && res.data) {
+                const data = res.data;
+                setFormData({
+                    brand_cat_id: data?.brand_cat_id || '',
+                    name: data?.name || '',
+                    seo_url: data?.seo_url || '',
+                    meta_title: data?.meta_title || '',
+                    meta_description: data?.meta_description || '',
+                    meta_keyword: data?.meta_keyword || '',
+                    top_title: data?.top_title || '',
+                    top_des: data?.top_des || '',
+                    b_des: data?.b_des || '',
+                    status: data?.status || false,
+                    cat_ids: data?.cat_id?.split(",").map(cid => cid.trim()) || [],
+                });
+                if (data.image) {
+                    const isFullPath = data.image.startsWith('uploads/images');
+                    setImagePreview(isFullPath ? `${serverURL}/${data.image}` : `${serverURL}/uploads/images/${data.image}`);
+                }
+                if (data.banner) {
+                    const isFullPath = data.banner.startsWith('uploads/images');
+                    setBannerPreview(isFullPath ? `${serverURL}/${data.banner}` : `${serverURL}/uploads/images/${data.banner}`);
+                }
+            } else {
+                toast.error("Brand not found");
+            }
+        } catch {
+            toast.error("Failed to load brand data");
+        }
+    };
+
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
         setFormData((prev) => ({
@@ -335,15 +346,15 @@ const EditBrand = () => {
 
     const handleCategorySelect = (e) => {
         const value = e.target.value;
-        if (value && !formData.cat_ids.includes(value)) {
-            setFormData((prev) => ({ ...prev, cat_ids: [...prev.cat_ids, value], }));
+        if (value && !formData.cat_ids?.includes(value)) {
+            setFormData((prev) => ({ ...prev, cat_ids: [...(prev.cat_ids || []), value] }));
         }
     };
 
-    const removeCategory = (id) => {
+    const removeCategory = (cid) => {
         setFormData((prev) => ({
             ...prev,
-            cat_ids: prev.cat_ids.filter((cid) => cid !== id),
+            cat_ids: prev.cat_ids.filter(id => id !== cid),
         }));
     };
 
@@ -382,6 +393,7 @@ const EditBrand = () => {
                     data.append(key, value);
                 }
             });
+
             if (image) data.append('image', image);
             if (banner) data.append('banner', banner);
 
@@ -399,8 +411,6 @@ const EditBrand = () => {
         }
     };
 
-    console.log("XXXXXXXXXXXXXX:---", formData)
-
     return (
         <>
             <ToastContainer />
@@ -413,22 +423,23 @@ const EditBrand = () => {
 
             <div className="d-form">
                 <form className="row g-3" onSubmit={handleSubmit}>
-
-                    {/* Brand Category */}
                     <div className="col-md-6">
                         <label className="form-label">Brand Category *</label>
-                        <select name="brand_cat_id" className="form-select" value={formData.brand_cat_id} onChange={handleChange} required >
+                        <select name="brand_cat_id" className="form-select" value={formData.brand_cat_id} onChange={handleChange} required>
                             <option value="">Select Brand Category</option>
-                            {brandCategories?.map(cat => (<option key={cat?.id} value={cat?.id}>{cat?.name}</option>))}
+                            {brandCategories.map(cat => (
+                                <option key={cat.id} value={cat.id}>{cat.name}</option>
+                            ))}
                         </select>
                     </div>
 
-                    {/* Category Multi-Select */}
                     <div className="col-md-6">
                         <label className="form-label">Categories *</label>
                         <select className="form-select" onChange={handleCategorySelect}>
                             <option value="">Select Category</option>
-                            {categories?.map(cat => (<option key={cat?.id} value={cat?.id}>{cat?.name}</option>))}
+                            {categories.map(cat => (
+                                <option key={cat?.id} value={cat?.id}>{cat?.name}</option>
+                            ))}
                         </select>
                         <div className="mt-2 d-flex flex-wrap gap-2">
                             {formData?.cat_ids?.map(cid => {
@@ -443,7 +454,6 @@ const EditBrand = () => {
                         </div>
                     </div>
 
-                    {/* Text and TextArea Inputs */}
                     {[
                         { label: "Name", name: "name", required: true },
                         { label: "SEO URL", name: "seo_url" },
@@ -457,28 +467,25 @@ const EditBrand = () => {
                         <div className="col-md-6" key={name}>
                             <label className="form-label">{label}{required && ' *'}</label>
                             {type === "textarea" ? (
-                                <textarea name={name} className="form-control" value={formData[name]} onChange={handleChange} required={required} />
+                                <textarea name={name} className="form-control" value={formData[name]} onChange={handleChange} required={required}></textarea>
                             ) : (
                                 <input type="text" name={name} className="form-control" value={formData[name]} onChange={handleChange} required={required} />
                             )}
                         </div>
                     ))}
 
-                    {/* Image Upload */}
                     <div className="col-md-6">
                         <label className="form-label">Image</label>
                         <input type="file" className="form-control" onChange={handleImageChange} />
-                        {imagePreview && <img src={imagePreview} alt="preview" className="img-thumbnail mt-2" width={100} />}
+                        {imagePreview && <img src={imagePreview} alt="Image" className="img-thumbnail mt-2" width={100} />}
                     </div>
 
-                    {/* Banner Upload */}
                     <div className="col-md-6">
                         <label className="form-label">Banner</label>
                         <input type="file" className="form-control" onChange={handleBannerChange} />
-                        {bannerPreview && <img src={bannerPreview} alt="preview" className="img-thumbnail mt-2" width={100} />}
+                        {bannerPreview && <img src={bannerPreview} alt="Banner" className="img-thumbnail mt-2" width={100} />}
                     </div>
 
-                    {/* Status Checkbox */}
                     <div className="col-md-6 d-flex align-items-center mt-4">
                         <div className="form-check">
                             <input type="checkbox" name="status" className="form-check-input" checked={formData.status} onChange={handleChange} id="status" />
@@ -486,7 +493,6 @@ const EditBrand = () => {
                         </div>
                     </div>
 
-                    {/* Submit */}
                     <div className="col-12 text-center">
                         <button type="submit" className="btn btn-success" disabled={isLoading}>
                             {isLoading ? "Please Wait..." : "Update Brand"}

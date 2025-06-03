@@ -285,6 +285,108 @@ exports.deleteProduct = async (req, res) => {
 };
 
 
+// exports.searchProduct = async (req, res) => {
+//     try {
+//         const search = req.query.search?.trim() || "";
+//         const page = parseInt(req.query.page) || 1;
+//         const limit = parseInt(req.query.limit) || 10;
+//         const offset = (page - 1) * limit;
+
+//         const brand = req.query.brand || "";
+//         const brandCategory = req.query.brandCategory || "";
+//         const category = req.query.category || "";
+
+//         let filterSql = [];
+//         let filterParams = [];
+
+//         // Search filter
+//         if (search) {
+//             filterSql.push(`
+//                 (
+//                     cyb_product.name LIKE ? OR
+//                     cyb_product.part_no LIKE ? OR
+//                     cyb_brands.name LIKE ?
+//                 )
+//             `);
+//             const likeSearch = `%${search}%`;
+//             filterParams.push(likeSearch, likeSearch, likeSearch);
+//         }
+
+//         // Brand filter
+//         if (brand) {
+//             const brandIds = brand.split(',').map(id => parseInt(id));
+//             filterSql.push(`cyb_product.brand IN (${brandIds.map(() => '?').join(',')})`);
+//             filterParams.push(...brandIds);
+//         }
+
+//         // Brand Category filter
+//         if (brandCategory) {
+//             const catIds = brandCategory.split(',').map(id => parseInt(id));
+//             filterSql.push(`cyb_brands.brand_cat_id IN (${catIds.map(() => '?').join(',')})`);
+//             filterParams.push(...catIds);
+//         }
+
+//         // Category filter
+//         if (category) {
+//             const catIds = category.split(',').map(id => parseInt(id));
+//             filterSql.push(`cyb_product.category IN (${catIds.map(() => '?').join(',')})`);
+//             filterParams.push(...catIds);
+//         }
+
+//         const whereClause = filterSql.length ? `WHERE ${filterSql.join(" AND ")}` : "";
+
+//         // Count query
+//         const countQuery = `
+//             SELECT COUNT(*) AS total
+//             FROM cyb_product
+//             JOIN cyb_brands ON cyb_product.brand = cyb_brands.id
+//             ${whereClause}
+//         `;
+
+//         pool.query(countQuery, filterParams, (countErr, countResult) => {
+//             if (countErr) {
+//                 console.error("Count error:", countErr);
+//                 return res.status(500).json({ status: false, message: "Database count error" });
+//             }
+
+//             const total = countResult[0]?.total || 0;
+//             const totalPages = Math.ceil(total / limit);
+
+//             const dataQuery = `
+//                 SELECT
+//                     cyb_product.*,
+//                     cyb_brands.name AS brand_name,
+//                     cyb_brands.image AS brand_image
+//                 FROM cyb_product
+//                 JOIN cyb_brands ON cyb_product.brand = cyb_brands.id
+//                 ${whereClause}
+//                 ORDER BY cyb_product.id DESC
+//                 LIMIT ? OFFSET ?
+//             `;
+
+//             pool.query(dataQuery, [...filterParams, limit, offset], (dataErr, results) => {
+//                 if (dataErr) {
+//                     console.error("Data fetch error:", dataErr);
+//                     return res.status(500).json({ status: false, message: "Database data fetch error" });
+//                 }
+
+//                 return res.status(200).json({
+//                     status: true,
+//                     currentPage: page,
+//                     totalPages,
+//                     totalItems: total,
+//                     data: results,
+//                 });
+//             });
+//         });
+
+//     } catch (error) {
+//         console.error("Search product error:", error);
+//         return res.status(500).json({ status: false, message: "Server error" });
+//     }
+// };
+
+
 exports.searchProduct = async (req, res) => {
     try {
         const search = req.query.search?.trim() || "";
@@ -299,20 +401,13 @@ exports.searchProduct = async (req, res) => {
         let filterSql = [];
         let filterParams = [];
 
-        // Search filter
+        // Only search by brand name
         if (search) {
-            filterSql.push(`
-                (
-                    cyb_product.name LIKE ? OR
-                    cyb_product.part_no LIKE ? OR
-                    cyb_brands.name LIKE ?
-                )
-            `);
-            const likeSearch = `%${search}%`;
-            filterParams.push(likeSearch, likeSearch, likeSearch);
+            filterSql.push(`cyb_brands.name LIKE ?`);
+            filterParams.push(`%${search}%`);
         }
 
-        // Brand filter
+        // Brand filter (by brand ID)
         if (brand) {
             const brandIds = brand.split(',').map(id => parseInt(id));
             filterSql.push(`cyb_product.brand IN (${brandIds.map(() => '?').join(',')})`);
@@ -326,7 +421,7 @@ exports.searchProduct = async (req, res) => {
             filterParams.push(...catIds);
         }
 
-        // Category filter
+        // Product Category filter
         if (category) {
             const catIds = category.split(',').map(id => parseInt(id));
             filterSql.push(`cyb_product.category IN (${catIds.map(() => '?').join(',')})`);
@@ -385,6 +480,9 @@ exports.searchProduct = async (req, res) => {
         return res.status(500).json({ status: false, message: "Server error" });
     }
 };
+
+
+
 
 exports.getAllProductWithoutPagination = async (req, res) => {
     try {

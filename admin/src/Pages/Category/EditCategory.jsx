@@ -20,6 +20,8 @@ const EditCategory = () => {
         keywords: '',
         image: null,
         imagePreview: '',
+        thumbnail: null,
+        thumbnailPreview: '',
         active: false,
     });
 
@@ -29,6 +31,8 @@ const EditCategory = () => {
         dispatch(fetchCategory(_id));
     }, [dispatch, _id]);
 
+
+    console.log("category",category)
     useEffect(() => {
         if (category) {
             setData({
@@ -39,62 +43,67 @@ const EditCategory = () => {
                 keywords: category.keyword || '',
                 image: null,
                 imagePreview: category.image || '',
+                thumbnail: null,
+                thumbnailPreview: category.thumbnail || '',
                 active: category.status === '1' || category.status === 1 || category.status === true,
             });
         }
     }, [category]);
 
-    const getInputData = (e) => {
+    const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setData({
-            ...data,
+        setData((prev) => ({
+            ...prev,
             [name]: type === 'checkbox' ? checked : value,
-        });
+        }));
     };
 
-    const getFileData = (e) => {
+    const handleImageChange = (e, field) => {
         const file = e.target.files[0];
         if (file && file.size > 2 * 1024 * 1024) {
-            toast.error("File size should be less than 2MB");
+            toast.error("File size must be under 2MB");
             return;
         }
-        setData({
-            ...data,
-            image: file,
-            imagePreview: file ? URL.createObjectURL(file) : data.imagePreview
-        });
+        const preview = URL.createObjectURL(file);
+        setData((prev) => ({
+            ...prev,
+            [field]: file,
+            [`${field}Preview`]: preview,
+        }));
     };
 
-    const postData = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-
         const formData = new FormData();
+
         formData.append("name", data.categoryname);
         formData.append("meta_title", data.metaTagTitle);
         formData.append("meta_description", data.metaTagDescription);
         formData.append("meta_keyword", data.metaTagKeywords);
         formData.append("keyword", data.keywords);
-        formData.append("image", data.image);
-        formData.append("status", data.active ? 1 : 0)
-        formData.append("existingImage", data.imagePreview)
+        formData.append("status", data.active ? 1 : 0);
+        formData.append("existingImage", data.imagePreview);
+        formData.append("existingThumbnail", data.thumbnailPreview);
+        if (data.image) formData.append("image", data.image);
+        if (data.thumbnail) formData.append("thumbnail", data.thumbnail);
 
         setLoading(true);
         try {
-            await dispatch(updateCategory({ id: _id, formData }))
-                .unwrap()
-                .then((res) => {
-                    toast.success(res?.message || "Category updated successfully");
-                    navigate("/all-category");
-                })
-                .catch((error) => {
-                    toast.error(`Error: ${error.message}`);
-                });
-
+            const res = await dispatch(updateCategory({ id: _id, formData })).unwrap();
+            toast.success(res?.message || "Category updated successfully");
+            navigate("/all-category");
         } catch (error) {
-            toast.error("Failed to update category");
+            toast.error(`Error: ${error.message || "Failed to update category"}`);
         } finally {
             setLoading(false);
         }
+    };
+
+    const renderImagePreview = (preview, defaultPath) => {
+        const imageUrl = preview.startsWith('blob:')
+            ? preview
+            : `${serverURL}/uploads/images/${preview}`;
+        return <img src={imageUrl} alt="Preview" height="100" style={{ marginTop: 10 }} />;
     };
 
     return (
@@ -105,66 +114,70 @@ const EditCategory = () => {
                     <h4>Edit Category</h4>
                 </div>
                 <div className="links">
-                    <Link to="/all-category" className="add-new">Back <i className="fa-regular fa-circle-left"></i></Link>
+                    <Link to="/all-category" className="add-new">
+                        Back <i className="fa-regular fa-circle-left"></i>
+                    </Link>
                 </div>
             </div>
 
             <div className="d-form">
-                <form onSubmit={postData}>
+                <form onSubmit={handleSubmit}>
                     <div className="row mb-3">
+                        {[
+                            { label: 'Category Name', name: 'categoryname' },
+                            { label: 'Meta Tag Title', name: 'metaTagTitle' },
+                            { label: 'Meta Tag Description', name: 'metaTagDescription' },
+                            { label: 'Meta Tag Keywords', name: 'metaTagKeywords' },
+                            { label: 'Keywords', name: 'keywords' },
+                        ].map(({ label, name }) => (
+                            <div key={name} className={`col-md-${name === 'metaTagDescription' ? '12' : '6'}`}>
+                                <label className="form-label">
+                                    {label} <sup className="text-danger">*</sup>
+                                </label>
+                                <input
+                                    type="text"
+                                    name={name}
+                                    className="form-control"
+                                    value={data[name]}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </div>
+                        ))}
+
                         <div className="col-md-6">
-                            <label className="form-label">
-                                Category Name <sup className="text-danger">*</sup>
-                            </label>
-                            <input type="text" name="categoryname" className="form-control" value={data.categoryname} onChange={getInputData} required />
+                            <label className="form-label">Category Banner Image</label>
+                            <input
+                                type="file"
+                                name="image"
+                                className="form-control"
+                                accept="image/*"
+                                onChange={(e) => handleImageChange(e, 'image')}
+                            />
+                            {data.imagePreview && renderImagePreview(data.imagePreview)}
                         </div>
 
                         <div className="col-md-6">
-                            <label className="form-label">
-                                Meta Tag Title <sup className="text-danger">*</sup>
-                            </label>
-                            <input type="text" name="metaTagTitle" className="form-control" value={data.metaTagTitle} onChange={getInputData} required />
-                        </div>
-
-                        <div className="col-md-12">
-                            <label className="form-label">
-                                Meta Tag Description <sup className="text-danger">*</sup>
-                            </label>
-                            <input type="text" name="metaTagDescription" className="form-control" value={data.metaTagDescription} onChange={getInputData} required />
-                        </div>
-
-                        <div className="col-md-6">
-                            <label className="form-label">
-                                Meta Tag Keywords <sup className="text-danger">*</sup>
-                            </label>
-                            <input type="text" name="metaTagKeywords" className="form-control" value={data.metaTagKeywords} onChange={getInputData} required />
-                        </div>
-
-                        <div className="col-md-6">
-                            <label className="form-label">
-                                Keywords <sup className="text-danger">*</sup>
-                            </label>
-                            <input type="text" name="keywords" className="form-control" value={data.keywords} onChange={getInputData} required />
-                        </div>
-
-                        <div className="col-md-6">
-                            <label className="form-label">
-                                Category Image {data.imagePreview && <span>(Preview below)</span>}
-                            </label>
-                            <input type="file" name="image" className="form-control" onChange={getFileData} accept="image/*" />
-                            {data.image ? <>{
-                                data?.imagePreview && (
-                                    <div style={{ marginTop: '10px' }}>
-                                        <img src={data.imagePreview || `${serverURL}/uploads/images/${data.imagePreview}`} alt="Preview" height="100" />
-                                    </div>
-                                )
-                            } </> : <div style={{ marginTop: '10px' }}>
-                                <img src={`${serverURL}/uploads/images/${data.imagePreview}` || data.imagePreview} alt="Preview" height="100" />
-                            </div>}
+                            <label className="form-label">Category Thumbnail</label>
+                            <input
+                                type="file"
+                                name="thumbnail"
+                                className="form-control"
+                                accept="image/*"
+                                onChange={(e) => handleImageChange(e, 'thumbnail')}
+                            />
+                            {data.thumbnailPreview && renderImagePreview(data.thumbnailPreview)}
                         </div>
 
                         <div className="col-md-6 d-flex align-items-center" style={{ marginTop: 20 }}>
-                            <input type="checkbox" name="active" checked={data.active} onChange={getInputData} id="active" style={{ marginRight: 8 }} />
+                            <input
+                                type="checkbox"
+                                name="active"
+                                checked={data.active}
+                                onChange={handleInputChange}
+                                id="active"
+                                style={{ marginRight: 8 }}
+                            />
                             <label htmlFor="active">Active</label>
                         </div>
                     </div>

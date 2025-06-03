@@ -83,7 +83,15 @@ const AllBrand = () => {
                                 <td>{item.brand_category_name}</td>
                                 <td>{item.name}</td>
                                 <td>
-                                    {item.image ? <img src={`${serverURL}/uploads/images/${item.image}`} alt="brand" width="50" /> : "No Image"}
+                                    {item?.image && typeof item.image === 'string' ? (
+                                        item?.image.startsWith("uploads/images") ? (
+                                            <img src={`${serverURL}/${item?.image}`} alt="brand" width="50" />
+                                        ) : (
+                                            <img src={`${serverURL}/uploads/images/${item?.image}`} alt="brand" width="50" />
+                                        )
+                                    ) : (
+                                        <span>No Image</span>
+                                    )}
                                 </td>
                                 <td>{item.status === 1 ? "Active" : "Inactive"}</td>
                                 <td>

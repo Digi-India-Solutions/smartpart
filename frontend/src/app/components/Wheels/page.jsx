@@ -83,7 +83,7 @@ const router = useRouter()
 
   const filterData = brand.filter((item) => item?.brand_category_name === 'TOP 2/3 WHEELERS BRANDS' && item?.status===1)
   const filterData2 = brand.filter((item) => item?.brand_category_name === '2/3 WHEELERS AFTERMARKET BRANDS' && item?.status===1)
-  console.log("FRONEND_DATA:-", filterData2)
+  console.log("FRONEND_DATA:-WHEEL:=>", filterData2)
 
   const handleCategoryClick = (category) => {
     router.push(
@@ -105,8 +105,17 @@ const router = useRouter()
                 <div onClick={()=>handleCategoryClick(item)}  className='text-decoration-none text-dark'>
                 <div className='Wheel-item'>
                   <div className='d-flex justify-content-center'>
-                   <Image className="brandimg" src={`${serverURL}/uploads/images/${item?.image}` || item?.image || `${serverURL}/${item?.image}`} width={100} height={100} alt={item?.name} />
-                  </div>
+                  <Image
+                                        src={
+                                          item?.image
+                                            ? (item?.image?.includes('uploads/images')
+                                              ? `${serverURL}/${item?.image}`
+                                              : `${serverURL}/uploads/images/${item?.image}`)
+                                            : '/default-category.png'
+                                        }
+                                        width={100} height={100}
+                                        alt={item?.name || 'Brand Image'} style={{ objectFit: 'contain' }} />
+                                          </div>
                   <p className='text-center'>
                     {item.name}
                   </p>

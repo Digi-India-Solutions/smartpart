@@ -25,7 +25,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-router.post("/create-categoey", upload.single('image'), createCategory);
+router.post("/create-categoey", upload.fields([{ name: "image", maxCount: 1 }, { name: "thumbnail", maxCount: 1 }]), createCategory);
 
 router.get("/get-all-categorys", getAllCategorys);
 
@@ -33,7 +33,7 @@ router.post("/change-category-status/:id", changeStatus)
 
 router.get("/get-category-by-id/:id", getCategoryById);
 
-router.post("/update-category/:id", upload.single('image'), updateCategoryByID);
+router.post("/update-category/:id",  upload.fields([{ name: "image", maxCount: 1 }, { name: "thumbnail", maxCount: 1 }]), updateCategoryByID);
 
 router.get("/delete-category/:id", deleteCategoryByID);
 

@@ -57,10 +57,10 @@ const Category = () => {
                             <div className="border p-3 text-center h-100 rounded category-box hover-shadow">
                                 <Image
                                     src={
-                                        category?.image
-                                            ? (category?.image?.includes('uploads/images')
-                                                ? `${serverURL}/${category.image}`
-                                                : `${serverURL}/uploads/images/${category.image}`)
+                                        category?.thumbnail
+                                            ? (category?.thumbnail?.includes('uploads/images')
+                                                ? `${serverURL}/${category?.thumbnail}`
+                                                : `${serverURL}/uploads/images/${category?.thumbnail}`)
                                             : '/default-category.png'
                                     }
                                     width={100}

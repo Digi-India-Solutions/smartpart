@@ -100,7 +100,7 @@ const AllCategory = () => {
                                     <td>
                                         {item.image ? (
                                             <img
-                                                src={`${serverURL}/uploads/images/${item.image}`}
+                                                src={item?.thumbnail?.startsWith('uploads/images')? `${serverURL}/${item?.thumbnail}`:`${serverURL}/uploads/images/${item?.thumbnail}`}
                                                 alt={item.name}
                                                 style={{ height: 60, width: 60, objectFit: 'contain' }}
                                             />

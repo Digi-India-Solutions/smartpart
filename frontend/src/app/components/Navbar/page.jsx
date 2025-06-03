@@ -211,6 +211,7 @@ const Navbar = () => {
               <li className="nav-item"><Link className="nav-link active" href="/">Home</Link></li>
               <li className="nav-item"><Link className="nav-link" href="/pages/shop">Shop</Link></li>
               <li className="nav-item"><Link className="nav-link" href="/pages/brands">Brands</Link></li>
+              <li className="nav-item"><Link className="nav-link" href="/pages/all-category">Category</Link></li>
               <li className="nav-item"><Link className="nav-link" href="/pages/about-us">About Us</Link></li>
               <li className="nav-item"><Link className="nav-link" href="/pages/contact-us">Contact Us</Link></li>
               <li className="nav-item"><Link className="nav-link" href="/pages/blog">Blogs</Link></li>

@@ -221,13 +221,13 @@ const AllProduct = () => {
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 10;
 
-  const getApiData = async ( search = searchTerm, page = currentPage) => {
+  const getApiData = async (search = searchTerm, page = currentPage) => {
     try {
       const res = await getData(
         // `product/get-all-product?page=${currentPage}&limit=${itemsPerPage}`
         `product/get-all-product?page=${page}&limit=${itemsPerPage}&search=${search}`
       );
-      console.log("Product Data:", res.data);
+      console.log("Product Data:GGGGGGGGGG", res.data);
       if (res.status) {
         setProducts(res.data || []);
         setTotalPages(res.totalPages || 1);
@@ -334,13 +334,14 @@ const AllProduct = () => {
                   <td>{item.brand_name}</td>
                   <td>{item.part_no}</td>
                   <td>
+                    {/* 	https://www.smartpartsexports.com/uploads/product/1673873338_80839502ebe5edffa262.jpg*/}
                     <img
                       src={
                         item?.image
-                          ? item?.image.includes("cloudinary")
-                            ? item?.image
+                          ? item?.image.includes("uploads/product")
+                            ? `${serverURL}/${item?.image}`
                             : `${serverURL}/uploads/images/${item?.image}`
-                          : "https://via.placeholder.com/50"
+                          : " https://www.smartpartsexports.com"
                       }
                       alt="Product"
                       style={{ height: 50 }}

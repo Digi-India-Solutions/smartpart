@@ -17,32 +17,40 @@ const AddCategory = () => {
     metaTagKeywords: "",
     keywords: "",
     image: null,
+    thumbnail: null,
   });
 
-  const [active, setActive] = useState(false); // for setting status
+  const [active, setActive] = useState(false); // checkbox for status
 
-  const getInputData = (e) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const getFileData = (e) => {
+  const handleFileChange = (e) => {
     const { name, files } = e.target;
-    setData((prev) => ({ ...prev, [name]: files[0] }));
+    if (files.length) {
+      setData((prev) => ({ ...prev, [name]: files[0] }));
+    }
   };
 
-  const postData = (e) => {
+  const validateImage = (file, name) => {
+    if (!file) {
+      toast.error(`Please select a ${name}`);
+      return false;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error(`${name} size should be less than 2MB`);
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { image } = data;
-    if (!image) {
-      toast.error("Please select an image");
-      return;
-    }
-    if (image.size > 2 * 1024 * 1024) {
-      toast.error("File size should be less than 2MB");
-      return;
-    }
+    if (!validateImage(data.image, "Category Banner Image")) return;
+    if (!validateImage(data.thumbnail, "Category Thumbnail Image")) return;
 
     const formData = new FormData();
     formData.append("name", data.categoryname);
@@ -51,17 +59,16 @@ const AddCategory = () => {
     formData.append("meta_keyword", data.metaTagKeywords);
     formData.append("keyword", data.keywords);
     formData.append("image", data.image);
+    formData.append("thumbnail", data.thumbnail);
     formData.append("status", active);
 
-    dispatch(addCategory(formData))
-      .unwrap()
-      .then((res) => {
-        toast.success("Category added successfully");
-        navigate("/all-category");
-      })
-      .catch((error) => {
-        toast.error(`Error: ${error.message}`);
-      });
+    try {
+      await dispatch(addCategory(formData)).unwrap();
+      toast.success("Category added successfully!");
+      navigate("/all-category");
+    } catch (error) {
+      toast.error(`Failed to add category: ${error.message}`);
+    }
   };
 
   return (
@@ -79,58 +86,133 @@ const AddCategory = () => {
       </div>
 
       <div className="d-form">
-        <form onSubmit={postData}>
+        <form onSubmit={handleSubmit}>
           <div className="row mb-3">
-            <div className="col-md-6">
+
+            <div className="col-md-6 mt-2">
               <label htmlFor="categoryname" className="form-label">
                 Category Name <sup className="text-danger">*</sup>
               </label>
-              <input type="text" name="categoryname" id="categoryname" className="form-control" value={data.categoryname} onChange={getInputData} placeholder="Category Name" required />
+              <input
+                type="text"
+                id="categoryname"
+                name="categoryname"
+                className="form-control"
+                value={data.categoryname}
+                onChange={handleInputChange}
+                placeholder="Category Name"
+                required
+              />
             </div>
 
-            <div className="col-md-6">
+            <div className="col-md-6 mt-2">
               <label htmlFor="metaTagTitle" className="form-label">
                 Meta Tag Title <sup className="text-danger">*</sup>
               </label>
-              <input type="text" name="metaTagTitle" id="metaTagTitle" className="form-control" value={data.metaTagTitle} onChange={getInputData} placeholder="Meta Tag Title" required />
+              <input
+                type="text"
+                id="metaTagTitle"
+                name="metaTagTitle"
+                className="form-control"
+                value={data.metaTagTitle}
+                onChange={handleInputChange}
+                placeholder="Meta Tag Title"
+                required
+              />
             </div>
 
-            <div className="mb-2">
+            <div className="col-md-12 mt-2">
               <label htmlFor="metaTagDescription" className="form-label">
                 Meta Tag Description <sup className="text-danger">*</sup>
               </label>
-              <input type="text" name="metaTagDescription" id="metaTagDescription" className="form-control" value={data.metaTagDescription} onChange={getInputData} placeholder="Meta Tag Description" required />
+              <input
+                type="text"
+                id="metaTagDescription"
+                name="metaTagDescription"
+                className="form-control"
+                value={data.metaTagDescription}
+                onChange={handleInputChange}
+                placeholder="Meta Tag Description"
+                required
+              />
             </div>
 
-            <div className="col-md-6">
+            <div className="col-md-6 mt-2">
               <label htmlFor="metaTagKeywords" className="form-label">
                 Meta Tag Keywords <sup className="text-danger">*</sup>
               </label>
-              <input type="text" name="metaTagKeywords" id="metaTagKeywords" className="form-control" value={data.metaTagKeywords} onChange={getInputData} placeholder="Meta Tag Keywords" required />
+              <input
+                type="text"
+                id="metaTagKeywords"
+                name="metaTagKeywords"
+                className="form-control"
+                value={data.metaTagKeywords}
+                onChange={handleInputChange}
+                placeholder="Meta Tag Keywords"
+                required
+              />
             </div>
 
-            <div className="col-md-6">
+            <div className="col-md-6 mt-2">
               <label htmlFor="keywords" className="form-label">
                 Keywords <sup className="text-danger">*</sup>
               </label>
-              <input type="text" name="keywords" id="keywords" className="form-control" value={data.keywords} onChange={getInputData} placeholder="Keywords" required />
+              <input
+                type="text"
+                id="keywords"
+                name="keywords"
+                className="form-control"
+                value={data.keywords}
+                onChange={handleInputChange}
+                placeholder="Keywords"
+                required
+              />
             </div>
 
-            <div className="col-md-6">
+            <div className="col-md-6 mt-2">
               <label htmlFor="image" className="form-label">
-                Category Image <sup className="text-danger">*</sup>
+                Category Banner Image <sup className="text-danger">*</sup>
               </label>
-              <input type="file" name="image" id="image" className="form-control" onChange={getFileData} accept="image/*" required />
+              <input
+                type="file"
+                id="image"
+                name="image"
+                className="form-control"
+                accept="image/*"
+                onChange={handleFileChange}
+                required
+              />
             </div>
 
-            <div style={{ marginTop: 20, marginBottom: 20, display: "flex", alignItems: "center", gap: "8px", fontSize: "16px", fontWeight: "500", color: "#333", }} className="col-md-6">
-              <input type="checkbox" name="active" id="active" checked={active} onChange={(e) => setActive(e.target.checked)} style={{ width: "16px", height: "16px" }} />
-              <label htmlFor="active">Active</label>
+            <div className="col-md-6 mt-2">
+              <label htmlFor="thumbnail" className="form-label">
+                Category Thumbnail Image <sup className="text-danger">*</sup>
+              </label>
+              <input
+                type="file"
+                id="thumbnail"
+                name="thumbnail"
+                className="form-control"
+                accept="image/*"
+                onChange={handleFileChange}
+                required
+              />
+            </div>
+
+            <div className="col-md-6 d-flex align-items-center mt-3">
+              <input
+                type="checkbox"
+                id="active"
+                checked={active}
+                onChange={(e) => setActive(e.target.checked)}
+                style={{ width: "18px", height: "18px", marginRight: "8px" }}
+              />
+              <label htmlFor="active" className="form-label mb-0">Active</label>
             </div>
           </div>
 
           <button type="submit" className="mybtnself" disabled={loading}>
-            {loading ? "Loading..." : "Add Category"}
+            {loading ? "Adding..." : "Add Category"}
           </button>
         </form>
       </div>

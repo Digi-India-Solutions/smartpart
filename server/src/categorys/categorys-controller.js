@@ -10,29 +10,38 @@ const ShortUniqueId = require("short-unique-id");
 
 exports.createCategory = catchAsyncErrors(async (req, res, next) => {
     try {
-        const { name, keyword, meta_title, meta_description, meta_keyword, status } = req.body;
+        const { name, keywords, metaTagTitle, metaTagDescription, metaTagKeywords, status } = req.body;
 
-        if (!name || !meta_title || !meta_description || !meta_keyword || !keyword) {
-            return res.status(400).json({
-                status: false,
-                message: "All required fields must be filled.",
-            });
+        // Validate required fields
+        // if (!categoryname || !keywords || !metaTagTitle || !metaTagDescription || !metaTagKeywords || typeof status === 'undefined'
+
+        // ) {
+        //     return res.status(400).json({ status: false, message: "All required fields must be filled.", });
+        // }
+
+        // Validate file uploads
+        const imageFile = req.files?.image?.[0];
+        const thumbnailFile = req.files?.thumbnail?.[0];
+
+        if (!imageFile || !thumbnailFile) {
+            return res.status(400).json({ status: false, message: "Both image and thumbnail are required.", });
         }
 
-        const image = req.file || null;
-        const imagePath = image ? image.filename : null;
+        const imagePath = imageFile.filename;
+        const thumbnailPath = thumbnailFile.filename;
 
         const create_date = new Date();
         const modify_date = new Date();
 
         const sql = `
             INSERT INTO cyb_category 
-            (name, keyword, image, meta_title, meta_description, meta_keyword, status, create_date, modify_date)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (name, keyword, image, thumbnail, meta_title, meta_description, meta_keyword, status, create_date, modify_date)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         const values = [
-            name, keyword, imagePath || '', meta_title, meta_description, meta_keyword, JSON.parse(status), create_date, modify_date
+            name, keywords, imagePath, thumbnailPath, metaTagTitle, metaTagDescription,
+            metaTagKeywords, JSON.parse(status), create_date, modify_date
         ];
 
         pool.query(sql, values, (error, result) => {
@@ -43,6 +52,7 @@ exports.createCategory = catchAsyncErrors(async (req, res, next) => {
 
             return res.status(200).json({ status: true, message: "Category submitted successfully.", data: result, });
         });
+
     } catch (error) {
         console.error("Unexpected error:", error);
         return res.status(500).json({ status: false, message: "Internal Server Error", });
@@ -60,7 +70,6 @@ exports.getAllCategorys = catchAsyncErrors(async (req, res, next) => {
 
     });
 });
-
 
 exports.changeStatus = catchAsyncErrors(async (req, res, next) => {
     const { id } = req.params;
@@ -107,39 +116,52 @@ exports.updateCategoryByID = catchAsyncErrors(async (req, res, next) => {
         meta_description,
         meta_keyword,
         status,
-        existingImage
+        existingImage,
+        existingThumbnail
     } = req.body;
 
-    const newImage = req.file ? req.file.filename : null;
-    const imageUrl = newImage || existingImage || null;
+    const newImage = req.files?.image?.[0]?.filename || null;
+    const newThumbnail = req.files?.thumbnail?.[0]?.filename || null;
+
+    // Final image and thumbnail paths to save
+    const imagePath = newImage || existingImage || null;
+    const thumbnailPath = newThumbnail || existingThumbnail || null;
 
     // Validation
-    if (!name || !keyword || !meta_title || !meta_description || !meta_keyword) {
-        return res.status(400).json({
-            status: false,
-            message: "All required fields must be filled.",
-        });
-    }
+    // if (!name || !keyword || !meta_title || !meta_description || !meta_keyword || !imagePath || !thumbnailPath) {
+    //     return res.status(400).json({
+    //         status: false,
+    //         message: "All required fields must be filled including image and thumbnail.",
+    //     });
+    // }
 
     try {
-        if (newImage) {
-            // Fetch old image from DB
-            const [oldCategory] = await new Promise((resolve, reject) => {
-                pool.query(`SELECT image FROM cyb_category WHERE id = ?`, [id], (err, result) => {
-                    if (err) return reject(err);
-                    resolve(result);
-                });
+        // Fetch old data to delete old image/thumbnail if needed
+        const [oldCategory] = await new Promise((resolve, reject) => {
+            pool.query(`SELECT image, thumbnail FROM cyb_category WHERE id = ?`, [id], (err, result) => {
+                if (err) return reject(err);
+                resolve(result);
             });
+        });
 
-            const oldImage = oldCategory?.image;
+        const oldImage = oldCategory?.image;
+        const oldThumbnail = oldCategory?.thumbnail;
 
-            // Delete old image from file system
-            if (oldImage) {
-                const oldImagePath = path.join(__dirname, "../../uploads/images", oldImage);
-                if (fs.existsSync(oldImagePath)) {
-                    fs.unlinkSync(oldImagePath);
-                    console.log("Old image deleted:", oldImagePath);
-                }
+        // Delete old image if replaced
+        if (newImage && oldImage && oldImage !== newImage) {
+            const oldImagePath = path.join(__dirname, "../../uploads/images", oldImage);
+            if (fs.existsSync(oldImagePath)) {
+                fs.unlinkSync(oldImagePath);
+                console.log("Old image deleted:", oldImagePath);
+            }
+        }
+
+        // Delete old thumbnail if replaced
+        if (newThumbnail && oldThumbnail && oldThumbnail !== newThumbnail) {
+            const oldThumbPath = path.join(__dirname, "../../uploads/images", oldThumbnail);
+            if (fs.existsSync(oldThumbPath)) {
+                fs.unlinkSync(oldThumbPath);
+                console.log("Old thumbnail deleted:", oldThumbPath);
             }
         }
 
@@ -147,7 +169,7 @@ exports.updateCategoryByID = catchAsyncErrors(async (req, res, next) => {
 
         const sql = `
             UPDATE cyb_category SET 
-                name = ?, keyword = ?, image = ?, 
+                name = ?, keyword = ?, image = ?, thumbnail = ?,
                 meta_title = ?, meta_description = ?, meta_keyword = ?, 
                 status = ?, modify_date = ?
             WHERE id = ?
@@ -156,7 +178,8 @@ exports.updateCategoryByID = catchAsyncErrors(async (req, res, next) => {
         const values = [
             name,
             keyword,
-            imageUrl,
+            imagePath,
+            thumbnailPath,
             meta_title,
             meta_description,
             meta_keyword,
@@ -184,23 +207,59 @@ exports.updateCategoryByID = catchAsyncErrors(async (req, res, next) => {
     }
 });
 
-exports.deleteCategoryByID = catchAsyncErrors(async (req, res, next) => {
+exports.deleteCategoryByID = catchAsyncErrors((req, res, next) => {
     const id = req.params.id;
-    console.log("GGGG",id)
-    pool.query('SELECT image FROM cyb_category WHERE id = ?', [id], (err, result) => {
-        if (err) return res.status(500).json({ status: false, message: err.message });
 
-        const oldImage = result[0]?.image;
-        if (oldImage) {
-            const imagePath = path.join(__dirname, '../../uploads/images', oldImage);
-            if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
+    // Step 1: Get image and thumbnail file names for the category
+    pool.query('SELECT image, thumbnail FROM cyb_category WHERE id = ?', [id], (err, rows) => {
+        if (err) {
+            console.error('DB error fetching category:', err);
+            return res.status(500).json({ status: false, message: 'Database error.' });
         }
 
-        pool.query("DELETE FROM cyb_category WHERE id = ?", [id], (error, result) => {
-            if (error) return res.status(500).json({ status: false, message: "Database error." });
+        if (rows.length === 0) {
+            return res.status(404).json({ status: false, message: 'Category not found.' });
+        }
 
-            return res.status(200).json({ status: true, message: "Category deleted successfully." });
+        const { image, thumbnail } = rows[0];
+
+        // Delete image file if exists
+        if (image) {
+            const imagePath = path.join(__dirname, '../../uploads/images', image);
+            if (fs.existsSync(imagePath)) {
+                try {
+                    fs.unlinkSync(imagePath);
+                } catch (fsErr) {
+                    console.error('Error deleting image file:', fsErr);
+                    // Proceed anyway, do not fail API because of file deletion error
+                }
+            }
+        }
+
+        // Delete thumbnail file if exists
+        if (thumbnail) {
+            const thumbPath = path.join(__dirname, '../../uploads/images', thumbnail);
+            if (fs.existsSync(thumbPath)) {
+                try {
+                    fs.unlinkSync(thumbPath);
+                } catch (fsErr) {
+                    console.error('Error deleting thumbnail file:', fsErr);
+                }
+            }
+        }
+
+        // Step 2: Delete the category from DB
+        pool.query('DELETE FROM cyb_category WHERE id = ?', [id], (deleteErr, result) => {
+            if (deleteErr) {
+                console.error('DB error deleting category:', deleteErr);
+                return res.status(500).json({ status: false, message: 'Database error.' });
+            }
+
+            if (result.affectedRows === 0) {
+                return res.status(400).json({ status: false, message: 'Failed to delete category.' });
+            }
+
+            return res.status(200).json({ status: true, message: 'Category deleted successfully.' });
         });
-    })
+    });
 });
-
