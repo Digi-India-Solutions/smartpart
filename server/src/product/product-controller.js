@@ -89,12 +89,13 @@ exports.getAllProduct = async (req, res) => {
           WHERE 
             cyb_product.name LIKE ? OR
             cyb_product.part_no LIKE ? OR
+            cyb_product.brand LIKE ? OR
             cyb_brands.id LIKE ? OR
             CAST(cyb_brands.brand_cat_id AS CHAR) LIKE ? OR
             CAST(cyb_product.brand AS CHAR) LIKE ?
         `;
             const likeSearch = `%${search}%`;
-            searchParams.push(likeSearch, likeSearch, likeSearch, likeSearch, likeSearch);
+            searchParams.push(likeSearch,likeSearch, likeSearch, likeSearch, likeSearch, likeSearch);
         }
 
         // Count query with JOIN so we can filter by brand category or brand name

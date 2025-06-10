@@ -880,8 +880,8 @@ const ProductCard = ({ image = '', name = '', description = '', part_no = '', id
     //   : `${serverURL}/uploads/images/${image}`;
     const imgSrc = image && typeof image === "string"
         ? image.startsWith("uploads/product")
-            ? `${serverURL}/uploads/product/${image}`
-            : `${serverURL}/uploads/images/${image}`
+            ? `${serverURL}/${image}`
+            : `${serverURL}/uploads/product/${image}`
         : pic1
 
     const safeHtmlParse = (html) => (typeof html === 'string' ? parse(html) : null);

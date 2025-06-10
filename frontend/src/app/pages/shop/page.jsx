@@ -390,7 +390,7 @@ import { toast } from "react-toastify";
 import "./shop.css";
 import parse from 'html-react-parser';
 import { useSearchParams } from "next/navigation";
-
+import pic1 from "@/app/assets/productItem.jpg";
 // Reusable FilterSection Component
 const FilterSection = ({ title, items, selectedIds, onToggle, defaultOpen = false }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
@@ -449,8 +449,13 @@ const FilterSection = ({ title, items, selectedIds, onToggle, defaultOpen = fals
 
 // Product Card Component
 const ProductCard = ({ image, name, product_description, part_no, id }) => {
+
   const imgSrc = useMemo(
-    () => (image?.startsWith("uploads/product") ? `${serverURL}/${image} `: `${serverURL}/uploads/images/${image}`),
+    () => (image && typeof image === "string"?
+      image?.startsWith("uploads/product") ? `${serverURL}/${image} `: 
+      `${serverURL}/uploads/product/${image}`:
+    pic1
+  ),
     [image]
   );
 
