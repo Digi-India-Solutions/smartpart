@@ -56,7 +56,7 @@ const AllCategory = () => {
     for (let i = 1; i <= Math.ceil(categories.length / itemsPerPage); i++) {
         pageNumbers.push(i);
     }
-
+    console.log("currentItems", currentItems.map((i) => i.thumbnail))
     return (
         <>
             <ToastContainer />
@@ -100,7 +100,7 @@ const AllCategory = () => {
                                     <td>
                                         {item.image ? (
                                             <img
-                                                src={item?.thumbnail?.startsWith('uploads/images')? `${serverURL}/${item?.thumbnail}`:`${serverURL}/uploads/images/${item?.thumbnail}`}
+                                                src={item?.thumbnail?.startsWith('uploads/images') ? `${serverURL}/${item?.thumbnail}` : `${serverURL}/uploads/images/${item?.thumbnail}`}
                                                 alt={item.name}
                                                 style={{ height: 60, width: 60, objectFit: 'contain' }}
                                             />

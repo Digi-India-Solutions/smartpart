@@ -355,7 +355,7 @@ const AllProduct = () => {
                     </Link>
                   </td>
                   <td>
-                    <button className="bt delete" onClick={() => deleteRecord(item.id)}>
+                    <button className="bt delete" onClick={() => deleteRecord(item?.id)}>
                       Delete <i className="fa-solid fa-trash"></i>
                     </button>
                   </td>
