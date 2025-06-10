@@ -450,9 +450,10 @@ const FilterSection = ({ title, items, selectedIds, onToggle, defaultOpen = fals
 // Product Card Component
 const ProductCard = ({ image, name, product_description, part_no, id }) => {
   const imgSrc = useMemo(
-    () => (image?.startsWith("http") ? image : `${serverURL}/uploads/images/${image}`),
+    () => (image?.startsWith("uploads/product") ? `${serverURL}/${image} `: `${serverURL}/uploads/images/${image}`),
     [image]
   );
+
 
   const HtmlRenderer = (product_description) => {
     const html = product_description;
@@ -468,7 +469,7 @@ const ProductCard = ({ image, name, product_description, part_no, id }) => {
     <article className="ShopProduct-card" aria-label={name}>
       <div className="ShopProductImg">
         <Image
-          src={imgSrc}
+          src={imgSrc.trim()||'IMAGE'}
           layout="responsive"
           width={300}
           height={250}
@@ -662,6 +663,7 @@ const ShopPage = () => {
       }
     }
 
+      console.log("XXXXXXXXXXXXX:-",products)
     return (
       <div className="pagination d-flex justify-content-center gap-2 flex-wrap mb-5">
         <button className="btn btn-outline-light" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1}>Previous</button>

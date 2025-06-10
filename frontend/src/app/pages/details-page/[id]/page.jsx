@@ -413,7 +413,7 @@ const ProductDetail = () => {
               src={
                 product?.image && typeof product.image === "string"
                   ? product.image.startsWith("uploads/product")
-                    ? `${serverURL}/uploads/product/${product?.image}`
+                    ? `${serverURL}/${product?.image}`
                     : `${serverURL}/uploads/images/${product?.image}`
                   : pic1
               }
