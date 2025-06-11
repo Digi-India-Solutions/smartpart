@@ -880,8 +880,8 @@ const ProductCard = ({ image = '', name = '', description = '', part_no = '', id
     //   : `${serverURL}/uploads/images/${image}`;
     const imgSrc = image && typeof image === "string"
         ? image.startsWith("uploads/product")
-            ? `${serverURL}/uploads/product/${image}`
-            : `${serverURL}/uploads/images/${image}`
+            ? `${serverURL}/${image}`
+            : `${serverURL}/uploads/product/${image}`
         : pic1
 
     const safeHtmlParse = (html) => (typeof html === 'string' ? parse(html) : null);
@@ -941,7 +941,6 @@ const Page = ({ id = "" }) => {
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
 
-    // Parse query params
     useEffect(() => {
         const query = searchParams.get("query");
         const titleParam = searchParams.get("title");
@@ -951,7 +950,6 @@ const Page = ({ id = "" }) => {
         if (query) setSearchTerm(decodeURIComponent(query));
     }, [searchParams]);
 
-    // Fetch helpers
     const fetchData = async (url, setter, errorMsg) => {
         try {
             const res = await getData(url);
@@ -976,7 +974,6 @@ const Page = ({ id = "" }) => {
         loadInitialFilters();
     }, [searchTerm]);
 
-    // Update filtered brands/categories
     useEffect(() => {
         const { selectedBrandCategory, selectedBrands, allBrand, category } = filters;
 
@@ -1001,7 +998,6 @@ const Page = ({ id = "" }) => {
         }));
     }, [filters.selectedBrandCategory, filters.selectedBrands, filters.allBrand, filters.category]);
 
-    // Product fetcher
     const fetchProducts = useCallback(async (
         search = searchTerm,
         page = currentPage,
@@ -1009,7 +1005,10 @@ const Page = ({ id = "" }) => {
     ) => {
         setLoading(true);
         try {
-            const url = `product/get-all-product?page=${page}&limit=${itemsPerPage}&search=${search}`;
+            let url
+            url = title === 'brand' ? `product/filtered-product?page=${page}&limit=${itemsPerPage}&search=${search}` :
+                `product/get-all-product-for-filter?page=${page}&limit=${itemsPerPage}&search=${search}`
+
             const res = await getData(url);
             if (res.status) {
                 setProducts(res.data || []);
@@ -1028,9 +1027,9 @@ const Page = ({ id = "" }) => {
 
     useEffect(() => {
         fetchProducts();
-    }, [fetchProducts]);
+    }, [fetchProducts, title, name]);
 
-    // Debounced search
+    console.log("ZZZZZZZZZZZZ:=>", title, name, searchTerm)
     const debouncedSearch = useMemo(() => debounce((query) => {
         setCurrentPage(1);
         fetchProducts(query, 1, { brand: filters.selectedBrands });
@@ -1058,6 +1057,7 @@ const Page = ({ id = "" }) => {
         } else if (filterType === "brand") {
             setFilters(prev => ({ ...prev, selectedBrands: updateSelection(prev.selectedBrands) }));
             setSearchTerm(id);
+            setTitle('')
         }
 
         setCurrentPage(1);
@@ -1084,7 +1084,7 @@ const Page = ({ id = "" }) => {
     console.log("products:---", products)
     return (
         <>
-            <HeroSection brandName={name} title={title} />
+            <HeroSection brandName={name} title={title}  />
             {id && title !== 'category' && (
                 <section className="DynamicProductSec bg-black pt-3">
                     <div className="container">

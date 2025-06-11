@@ -3,7 +3,7 @@ const router = Router();
 const multer = require('multer');
 const fs = require("fs");
 const path = require('path');
-const { createProduct, getAllProduct, getAllProductById, updateProduct, deleteProduct , searchProduct ,getAllProductWithoutPagination } = require("./product-controller")
+const { createProduct, getAllProduct, getAllProductById, updateProduct, deleteProduct, searchProduct, getAllProductWithoutPagination, getAllFILTEREDProduct, getAllProductForFilter } = require("./product-controller")
 
 const uploadDir = path.join(__dirname, '../../uploads/images');
 
@@ -29,14 +29,18 @@ router.post("/create-product", upload.single("image"), createProduct)
 
 router.get("/get-all-product", getAllProduct)
 
+router.get("/get-all-product-for-filter", getAllProductForFilter)
+
 router.get("/get-all-product-by-id/:id", getAllProductById)
 
 router.post("/update-product/:id", upload.single("image"), updateProduct)
 
 router.get('/delete-product/:id', deleteProduct);
 
-router.get('/search-product',searchProduct)
+router.get('/search-product', searchProduct)
 
-router.get('/get-all-product-without-pagination',getAllProductWithoutPagination)
+router.get('/filtered-product', getAllFILTEREDProduct)
+
+router.get('/get-all-product-without-pagination', getAllProductWithoutPagination)
 
 module.exports = router;

@@ -390,6 +390,7 @@ import { toast } from "react-toastify";
 import "./shop.css";
 import parse from 'html-react-parser';
 import { useSearchParams } from "next/navigation";
+import pic1 from "@/app/assets/productItem.jpg";
 
 // Reusable FilterSection Component
 const FilterSection = ({ title, items, selectedIds, onToggle, defaultOpen = false }) => {
@@ -449,11 +450,15 @@ const FilterSection = ({ title, items, selectedIds, onToggle, defaultOpen = fals
 
 // Product Card Component
 const ProductCard = ({ image, name, product_description, part_no, id }) => {
-  const imgSrc = useMemo(
-    () => (image?.startsWith("uploads/product") ? `${serverURL}/${image} `: `${serverURL}/uploads/images/${image}`),
-    [image]
-  );
-
+  // const imgSrc = useMemo(
+  //   () => (image?.startsWith("uploads/product") ? `${serverURL}/${image} ` : `${serverURL}/uploads/images/${image}`),
+  //   [image]
+  // );
+const imgSrc = image && typeof image === "string"
+        ? image.startsWith("uploads/product")
+            ? `${serverURL}/${image}`
+            : `${serverURL}/uploads/product/${image}`
+        : pic1
 
   const HtmlRenderer = (product_description) => {
     const html = product_description;
@@ -469,7 +474,7 @@ const ProductCard = ({ image, name, product_description, part_no, id }) => {
     <article className="ShopProduct-card" aria-label={name}>
       <div className="ShopProductImg">
         <Image
-          src={imgSrc.trim()||'IMAGE'}
+          src={imgSrc || 'IMAGE'}
           layout="responsive"
           width={300}
           height={250}
@@ -514,7 +519,7 @@ const ShopPage = () => {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [brandTop, setBrandTop] = useState(null);
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState(null);
   const [name, setName] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -594,7 +599,10 @@ const ShopPage = () => {
   ) => {
     setLoading(true);
     try {
-      const url = `product/get-all-product?page=${page}&limit=${itemsPerPage}&search=${encodeURIComponent(search || "")}`;
+      let url
+      url = title === 'brand' ? `product/filtered-product?page=${page}&limit=${itemsPerPage}&search=${search}` :
+        `product/get-all-product-for-filter?page=${page}&limit=${itemsPerPage}&search=${search}`
+
       const res = await getData(url);
       if (res.status) {
         setProducts(res.data || []);
@@ -633,6 +641,7 @@ const ShopPage = () => {
     const val = e.target.value;
     setSearchTerm(val);
     debouncedSearch(val);
+    setTitle('brand')
   };
 
   const handleToggle = (filterType, id) => {
@@ -649,7 +658,10 @@ const ShopPage = () => {
         ...prev,
         selectedBrands: updateSelection(prev.selectedBrands),
       }));
+
+      setTitle(null)
       setSearchTerm(id);
+      
     }
 
     setCurrentPage(1);
@@ -663,7 +675,7 @@ const ShopPage = () => {
       }
     }
 
-      console.log("XXXXXXXXXXXXX:-",products)
+    console.log("XXXXXXXXXXXXX:-", products)
     return (
       <div className="pagination d-flex justify-content-center gap-2 flex-wrap mb-5">
         <button className="btn btn-outline-light" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1}>Previous</button>
@@ -728,7 +740,11 @@ const ShopPage = () => {
                   ) : products.length > 0 ? (
                     <div className="shopproducts-grid row">
                       {products.map((product) => (
-                        <div className="col-md-6 col-lg-4 mb-4" key={product.id}>
+                        <div
+                          className="col-md-3 col-lg-3 mb-4"
+                          key={product?.id}
+                      // style={{  background: "yellow" }}
+                        >
                           <ProductCard {...product} />
                         </div>
                       ))}

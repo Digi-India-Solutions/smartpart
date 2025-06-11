@@ -89,12 +89,13 @@ exports.getAllProduct = async (req, res) => {
           WHERE 
             cyb_product.name LIKE ? OR
             cyb_product.part_no LIKE ? OR
+            cyb_product.brand LIKE ? OR
             cyb_brands.id LIKE ? OR
             CAST(cyb_brands.brand_cat_id AS CHAR) LIKE ? OR
             CAST(cyb_product.brand AS CHAR) LIKE ?
         `;
             const likeSearch = `%${search}%`;
-            searchParams.push(likeSearch, likeSearch, likeSearch, likeSearch, likeSearch);
+            searchParams.push(likeSearch, likeSearch, likeSearch, likeSearch, likeSearch, likeSearch);
         }
 
         // Count query with JOIN so we can filter by brand category or brand name
@@ -147,6 +148,55 @@ exports.getAllProduct = async (req, res) => {
     }
 };
 
+
+exports.getAllProductForFilter = async (req, res) => {
+    try {
+        const search = req.query.search?.trim() || "";
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 10;
+        const offset = (page - 1) * limit;
+
+        const searchPattern = `%${search}%`;
+
+        console.log("search:a---", search);
+
+        // Count query (search across brand, part_no, name)
+
+
+        pool.query(`SELECT COUNT(*) AS total FROM cyb_product WHERE brand = ${search} `, (countErr, countResult) => {
+            if (countErr) {
+                console.error("Count error:", countErr);
+                return res.status(500).json({ status: false, message: "Database count error" });
+            }
+
+            const total = countResult[0]?.total || 0;
+            const totalPages = Math.ceil(total / limit);
+
+            // Data query with same filters
+
+            pool.query(`SELECT * FROM cyb_product WHERE brand=${search} LIMIT ? OFFSET ?`, [limit, offset], (dataErr, dataResult) => {
+                if (dataErr) {
+                    console.error("Data fetch error:", dataErr);
+                    return res.status(500).json({ status: false, message: "Database fetch error" });
+                } else {
+                    console.log("dataResult:-", dataResult)
+                    return res.status(200).json({
+                        status: true,
+                        currentPage: page,
+                        totalPages,
+                        totalItems: total,
+                        data: dataResult,
+                    });
+                }
+
+            });
+        });
+
+    } catch (error) {
+        console.error("Fetch all products error:", error);
+        return res.status(500).json({ status: false, message: "Server error" });
+    }
+};
 // Get product by ID
 exports.getAllProductById = async (req, res) => {
     try {
@@ -285,107 +335,6 @@ exports.deleteProduct = async (req, res) => {
 };
 
 
-// exports.searchProduct = async (req, res) => {
-//     try {
-//         const search = req.query.search?.trim() || "";
-//         const page = parseInt(req.query.page) || 1;
-//         const limit = parseInt(req.query.limit) || 10;
-//         const offset = (page - 1) * limit;
-
-//         const brand = req.query.brand || "";
-//         const brandCategory = req.query.brandCategory || "";
-//         const category = req.query.category || "";
-
-//         let filterSql = [];
-//         let filterParams = [];
-
-//         // Search filter
-//         if (search) {
-//             filterSql.push(`
-//                 (
-//                     cyb_product.name LIKE ? OR
-//                     cyb_product.part_no LIKE ? OR
-//                     cyb_brands.name LIKE ?
-//                 )
-//             `);
-//             const likeSearch = `%${search}%`;
-//             filterParams.push(likeSearch, likeSearch, likeSearch);
-//         }
-
-//         // Brand filter
-//         if (brand) {
-//             const brandIds = brand.split(',').map(id => parseInt(id));
-//             filterSql.push(`cyb_product.brand IN (${brandIds.map(() => '?').join(',')})`);
-//             filterParams.push(...brandIds);
-//         }
-
-//         // Brand Category filter
-//         if (brandCategory) {
-//             const catIds = brandCategory.split(',').map(id => parseInt(id));
-//             filterSql.push(`cyb_brands.brand_cat_id IN (${catIds.map(() => '?').join(',')})`);
-//             filterParams.push(...catIds);
-//         }
-
-//         // Category filter
-//         if (category) {
-//             const catIds = category.split(',').map(id => parseInt(id));
-//             filterSql.push(`cyb_product.category IN (${catIds.map(() => '?').join(',')})`);
-//             filterParams.push(...catIds);
-//         }
-
-//         const whereClause = filterSql.length ? `WHERE ${filterSql.join(" AND ")}` : "";
-
-//         // Count query
-//         const countQuery = `
-//             SELECT COUNT(*) AS total
-//             FROM cyb_product
-//             JOIN cyb_brands ON cyb_product.brand = cyb_brands.id
-//             ${whereClause}
-//         `;
-
-//         pool.query(countQuery, filterParams, (countErr, countResult) => {
-//             if (countErr) {
-//                 console.error("Count error:", countErr);
-//                 return res.status(500).json({ status: false, message: "Database count error" });
-//             }
-
-//             const total = countResult[0]?.total || 0;
-//             const totalPages = Math.ceil(total / limit);
-
-//             const dataQuery = `
-//                 SELECT
-//                     cyb_product.*,
-//                     cyb_brands.name AS brand_name,
-//                     cyb_brands.image AS brand_image
-//                 FROM cyb_product
-//                 JOIN cyb_brands ON cyb_product.brand = cyb_brands.id
-//                 ${whereClause}
-//                 ORDER BY cyb_product.id DESC
-//                 LIMIT ? OFFSET ?
-//             `;
-
-//             pool.query(dataQuery, [...filterParams, limit, offset], (dataErr, results) => {
-//                 if (dataErr) {
-//                     console.error("Data fetch error:", dataErr);
-//                     return res.status(500).json({ status: false, message: "Database data fetch error" });
-//                 }
-
-//                 return res.status(200).json({
-//                     status: true,
-//                     currentPage: page,
-//                     totalPages,
-//                     totalItems: total,
-//                     data: results,
-//                 });
-//             });
-//         });
-
-//     } catch (error) {
-//         console.error("Search product error:", error);
-//         return res.status(500).json({ status: false, message: "Server error" });
-//     }
-// };
-
 
 exports.searchProduct = async (req, res) => {
     try {
@@ -497,5 +446,47 @@ exports.getAllProductWithoutPagination = async (req, res) => {
     } catch (error) {
         console.error("Unexpected error:", error);
         return res.status(500).json({ status: false, message: "Server error" });
+    }
+};
+
+
+exports.getAllFILTEREDProduct = async (req, res) => {
+    try {
+        const {
+            search = '',
+            page = 1,
+            limit = 10,
+            brandCategory = [],
+            brand = [],
+        } = req.query;
+
+        const offset = (parseInt(page) - 1) * parseInt(limit);
+        const searchPattern = `%${search}%`;
+
+        let baseQuery = `SELECT * FROM cyb_product WHERE name LIKE ? OR part_no LIKE ? `;
+        const queryParams = [searchPattern, searchPattern];
+
+        pool.query(baseQuery, queryParams, (err, results) => {
+            if (err) {
+                console.error('Database error:', err);
+                return res.status(500).json({ status: false, message: 'Database error' });
+            }
+
+            const total = results.length;
+            const totalPages = Math.ceil(total / limit);
+            const paginatedResults = results.slice(offset, offset + parseInt(limit));
+            console.log("paginatedResults:-", paginatedResults)
+            res.status(200).json({
+                status: true,
+                currentPage: parseInt(page),
+                totalPages,
+                totalItems: total,
+                data: paginatedResults,
+            });
+        });
+
+    } catch (error) {
+        console.error('Unhandled error:', error);
+        res.status(500).json({ status: false, message: 'Internal server error' });
     }
 };
