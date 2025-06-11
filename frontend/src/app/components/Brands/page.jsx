@@ -49,7 +49,7 @@ const Brands = () => {
   }, [])
 
 
-  const filterData = brand.filter((item) => item.brand_category_name === 'Top OEM Brands' && item?.status === 1)
+  const filterData = brand?.filter((item) => item?.brand_category_name === 'Top OEM Brands' && item?.status === 1) || []
   console.log("FRONEND_DATA:-", filterData)
 
   const handleCategoryClick = (category) => {
@@ -68,7 +68,7 @@ const Brands = () => {
         <h2 className="text-center">TOP <span className="text-theme bouncing-text"> OEM  BRANDS</span></h2>
         <div className="container">
           <div className='row justify-content-center'>
-            {filterData.map((item, index) =>
+            {filterData?.map((item, index) =>
               <div key={index} className="col-md-2 col-4 p-0">
                 <div onClick={() => handleCategoryClick(item)} className="text-decoration-none text-dark">
                   <div className='brand-item'>
