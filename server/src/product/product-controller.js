@@ -431,8 +431,6 @@ exports.searchProduct = async (req, res) => {
 };
 
 
-
-
 exports.getAllProductWithoutPagination = async (req, res) => {
     try {
         // Promisify the pool.query using async/await

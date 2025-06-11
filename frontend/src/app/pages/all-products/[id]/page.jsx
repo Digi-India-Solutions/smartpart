@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation'
 const page = () => {
   const { id } = useParams()
   const [searchTerm, setSearchTerm] = useState('')
+  console.log("XXXXXXXXXXXX:--",id)
   // useEffect(() => {
   //   // if (router.isReady) {
   //   const { query } = router.query;

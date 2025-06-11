@@ -414,7 +414,7 @@ const ProductDetail = () => {
                 product?.image && typeof product.image === "string"
                   ? product.image.startsWith("uploads/product")
                     ? `${serverURL}/${product?.image}`
-                    : `${serverURL}/uploads/images/${product?.image}`
+                    : `${serverURL}/uploads/product/${product?.image}`
                   : pic1
               }
               alt={product?.name || "Product"}
@@ -445,11 +445,11 @@ const ProductDetail = () => {
             <h2>Description</h2>
             <div className="w-75">{product?.product_description ? parse(product?.product_description) : "No description available."}</div>
 
-            <div className="Detail-product-buttons">
+            {/* <div className="Detail-product-buttons">
               <FaFacebook className="fs-1 facebook" />
               <FaTwitterSquare className="fs-1 twitter" />
               <FaSquareWhatsapp className="fs-1 whatsapp" />
-            </div>
+            </div> */}
 
             <button
               className="btn btn-primary w-25"

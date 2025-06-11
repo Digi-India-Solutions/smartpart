@@ -340,8 +340,8 @@ const AllProduct = () => {
                         item?.image
                           ? item?.image.includes("uploads/product")
                             ? `${serverURL}/${item?.image}`
-                            : `${serverURL}/uploads/images/${item?.image}`
-                          : " https://www.smartpartsexports.com"
+                            : `${serverURL}/uploads/product/${item?.image}`
+                          : "https://www.smartpartsexports.com"
                       }
                       alt="Product"
                       style={{ height: 50 }}

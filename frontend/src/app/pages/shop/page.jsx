@@ -391,7 +391,6 @@ import "./shop.css";
 import parse from 'html-react-parser';
 import { useSearchParams } from "next/navigation";
 import pic1 from "@/app/assets/productItem.jpg";
-
 // Reusable FilterSection Component
 const FilterSection = ({ title, items, selectedIds, onToggle, defaultOpen = false }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
